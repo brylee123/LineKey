@@ -1,0 +1,27 @@
+<resources>
+  <color name="menu_colorprimary">@color/menu_light_colorprimary</color>
+  <color name="menu_coloronprimary">@color/menu_light_coloronprimary</color>
+  <color name="menu_colorprimarycontainer">@color/menu_light_colorprimarycontainer</color>
+  <color name="menu_coloronprimarycontainer">@color/menu_light_coloronprimarycontainer</color>
+  <color name="menu_colorsecondary">@color/menu_light_colorsecondary</color>
+  <color name="menu_coloronsecondary">@color/menu_light_coloronsecondary</color>
+  <color name="menu_colorsecondarycontainer">@color/menu_light_colorsecondarycontainer</color>
+  <color name="menu_coloronsecondarycontainer">@color/menu_light_coloronsecondarycontainer</color>
+  <color name="menu_colortertiary">@color/menu_light_colortertiary</color>
+  <color name="menu_colorontertiary">@color/menu_light_colorontertiary</color>
+  <color name="menu_colortertiarycontainer">@color/menu_light_colortertiarycontainer</color>
+  <color name="menu_colorontertiarycontainer">@color/menu_light_colorontertiarycontainer</color>
+  <color name="menu_colorsurface">@color/menu_light_colorsurface</color>
+  <color name="menu_coloronsurface">@color/menu_light_coloronsurface</color>
+  <color name="menu_colorsurfacevariant">@color/menu_light_colorsurfacevariant</color>
+  <color name="menu_coloronsurfacevariant">@color/menu_light_coloronsurfacevariant</color>
+  <color name="menu_colorsurfacecontainerlowest">@color/menu_light_colorsurfacecontainerlowest</color>
+  <color name="menu_colorsurfacecontainerlow">@color/menu_light_colorsurfacecontainerlow</color>
+  <color name="menu_colorsurfacecontainer">@color/menu_light_colorsurfacecontainer</color>
+  <color name="menu_colorsurfacecontainerhigh">@color/menu_light_colorsurfacecontainerhigh</color>
+  <color name="menu_colorsurfacecontainerhighest">@color/menu_light_colorsurfacecontainerhighest</color>
+  <color name="menu_coloroutline">@color/menu_light_coloroutline</color>
+  <color name="menu_coloroutlinevariant">@color/menu_light_coloroutlinevariant</color>
+  <color name="menu_coloronbackground">@color/menu_light_coloronbackground</color>
+  <color name="menu_colorbackground">@color/menu_light_colorbackground</color>
+</resources>

@@ -1,0 +1,13 @@
+.gradle/
+.idea/
+local.properties
+**/build/
+*.iml
+*.jks
+*.keystore
+captures/
+# Proprietary reference material must never enter this repository.
+reference/
+*.apk
+*.dex
+*.so

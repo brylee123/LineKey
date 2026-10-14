@@ -1,0 +1,89 @@
+<resources>
+  <style name="KeyboardTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:fontFamily">sans</item>
+    <item name="android:colorAccent">#0B776E</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:navigationBarColor">#F5F7F6</item>
+  </style>
+  <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">@color/menu_colorprimary</item>
+    <item name="colorOnPrimary">@color/menu_coloronprimary</item>
+    <item name="colorPrimaryContainer">@color/menu_colorprimarycontainer</item>
+    <item name="colorOnPrimaryContainer">@color/menu_coloronprimarycontainer</item>
+    <item name="colorSecondary">@color/menu_colorsecondary</item>
+    <item name="colorOnSecondary">@color/menu_coloronsecondary</item>
+    <item name="colorSecondaryContainer">@color/menu_colorsecondarycontainer</item>
+    <item name="colorOnSecondaryContainer">@color/menu_coloronsecondarycontainer</item>
+    <item name="colorTertiary">@color/menu_colortertiary</item>
+    <item name="colorOnTertiary">@color/menu_colorontertiary</item>
+    <item name="colorTertiaryContainer">@color/menu_colortertiarycontainer</item>
+    <item name="colorOnTertiaryContainer">@color/menu_colorontertiarycontainer</item>
+    <item name="colorSurface">@color/menu_colorsurface</item>
+    <item name="colorOnSurface">@color/menu_coloronsurface</item>
+    <item name="colorSurfaceVariant">@color/menu_colorsurfacevariant</item>
+    <item name="colorOnSurfaceVariant">@color/menu_coloronsurfacevariant</item>
+    <item name="colorSurfaceContainerLowest">@color/menu_colorsurfacecontainerlowest</item>
+    <item name="colorSurfaceContainerLow">@color/menu_colorsurfacecontainerlow</item>
+    <item name="colorSurfaceContainer">@color/menu_colorsurfacecontainer</item>
+    <item name="colorSurfaceContainerHigh">@color/menu_colorsurfacecontainerhigh</item>
+    <item name="colorSurfaceContainerHighest">@color/menu_colorsurfacecontainerhighest</item>
+    <item name="colorOutline">@color/menu_coloroutline</item>
+    <item name="colorOutlineVariant">@color/menu_coloroutlinevariant</item>
+    <item name="colorOnBackground">@color/menu_coloronbackground</item>
+    <item name="android:colorBackground">@color/menu_colorbackground</item>
+  </style>
+  <style name="MenuThemeLight" parent="Theme.Material3.Light.NoActionBar">
+    <item name="colorPrimary">@color/menu_light_colorprimary</item>
+    <item name="colorOnPrimary">@color/menu_light_coloronprimary</item>
+    <item name="colorPrimaryContainer">@color/menu_light_colorprimarycontainer</item>
+    <item name="colorOnPrimaryContainer">@color/menu_light_coloronprimarycontainer</item>
+    <item name="colorSecondary">@color/menu_light_colorsecondary</item>
+    <item name="colorOnSecondary">@color/menu_light_coloronsecondary</item>
+    <item name="colorSecondaryContainer">@color/menu_light_colorsecondarycontainer</item>
+    <item name="colorOnSecondaryContainer">@color/menu_light_coloronsecondarycontainer</item>
+    <item name="colorTertiary">@color/menu_light_colortertiary</item>
+    <item name="colorOnTertiary">@color/menu_light_colorontertiary</item>
+    <item name="colorTertiaryContainer">@color/menu_light_colortertiarycontainer</item>
+    <item name="colorOnTertiaryContainer">@color/menu_light_colorontertiarycontainer</item>
+    <item name="colorSurface">@color/menu_light_colorsurface</item>
+    <item name="colorOnSurface">@color/menu_light_coloronsurface</item>
+    <item name="colorSurfaceVariant">@color/menu_light_colorsurfacevariant</item>
+    <item name="colorOnSurfaceVariant">@color/menu_light_coloronsurfacevariant</item>
+    <item name="colorSurfaceContainerLowest">@color/menu_light_colorsurfacecontainerlowest</item>
+    <item name="colorSurfaceContainerLow">@color/menu_light_colorsurfacecontainerlow</item>
+    <item name="colorSurfaceContainer">@color/menu_light_colorsurfacecontainer</item>
+    <item name="colorSurfaceContainerHigh">@color/menu_light_colorsurfacecontainerhigh</item>
+    <item name="colorSurfaceContainerHighest">@color/menu_light_colorsurfacecontainerhighest</item>
+    <item name="colorOutline">@color/menu_light_coloroutline</item>
+    <item name="colorOutlineVariant">@color/menu_light_coloroutlinevariant</item>
+    <item name="colorOnBackground">@color/menu_light_coloronbackground</item>
+    <item name="android:colorBackground">@color/menu_light_colorbackground</item>
+  </style>
+  <style name="MenuThemeDark" parent="Theme.Material3.Dark.NoActionBar">
+    <item name="colorPrimary">@color/menu_dark_colorprimary</item>
+    <item name="colorOnPrimary">@color/menu_dark_coloronprimary</item>
+    <item name="colorPrimaryContainer">@color/menu_dark_colorprimarycontainer</item>
+    <item name="colorOnPrimaryContainer">@color/menu_dark_coloronprimarycontainer</item>
+    <item name="colorSecondary">@color/menu_dark_colorsecondary</item>
+    <item name="colorOnSecondary">@color/menu_dark_coloronsecondary</item>
+    <item name="colorSecondaryContainer">@color/menu_dark_colorsecondarycontainer</item>
+    <item name="colorOnSecondaryContainer">@color/menu_dark_coloronsecondarycontainer</item>
+    <item name="colorTertiary">@color/menu_dark_colortertiary</item>
+    <item name="colorOnTertiary">@color/menu_dark_colorontertiary</item>
+    <item name="colorTertiaryContainer">@color/menu_dark_colortertiarycontainer</item>
+    <item name="colorOnTertiaryContainer">@color/menu_dark_colorontertiarycontainer</item>
+    <item name="colorSurface">@color/menu_dark_colorsurface</item>
+    <item name="colorOnSurface">@color/menu_dark_coloronsurface</item>
+    <item name="colorSurfaceVariant">@color/menu_dark_colorsurfacevariant</item>
+    <item name="colorOnSurfaceVariant">@color/menu_dark_coloronsurfacevariant</item>
+    <item name="colorSurfaceContainerLowest">@color/menu_dark_colorsurfacecontainerlowest</item>
+    <item name="colorSurfaceContainerLow">@color/menu_dark_colorsurfacecontainerlow</item>
+    <item name="colorSurfaceContainer">@color/menu_dark_colorsurfacecontainer</item>
+    <item name="colorSurfaceContainerHigh">@color/menu_dark_colorsurfacecontainerhigh</item>
+    <item name="colorSurfaceContainerHighest">@color/menu_dark_colorsurfacecontainerhighest</item>
+    <item name="colorOutline">@color/menu_dark_coloroutline</item>
+    <item name="colorOutlineVariant">@color/menu_dark_coloroutlinevariant</item>
+    <item name="colorOnBackground">@color/menu_dark_coloronbackground</item>
+    <item name="android:colorBackground">@color/menu_dark_colorbackground</item>
+  </style>
+</resources>

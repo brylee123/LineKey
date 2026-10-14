@@ -1,0 +1,196 @@
+
+Android model first-load ms: 1757.3896
+Android mean prediction lookup ms: 0.007222620000000001
+PASS: qwerty-compact aligns all 12 controls across 2 rows: []
+PASS: Mode cycle accepts tap
+PASS: qwerty-full aligns all 38 controls across 5 rows: []
+PASS: qwerty-full row 1 uses equal letter cells and centered gutters
+PASS: qwerty-full row 2 uses equal letter cells and centered gutters
+PASS: qwerty-full row 3 uses equal letter cells and centered gutters
+PASS: qwerty-full has the expected case controls
+PASS: qwerty-full visibly paints every letter, including W/M: 
+PASS: qwerty alphabet keys emit their displayed letters
+PASS: qwerty-emoji aligns all 34 controls across 5 rows: []
+PASS: qwerty-emoji row 1 uses equal letter cells and centered gutters
+PASS: qwerty-emoji row 2 uses equal letter cells and centered gutters
+PASS: qwerty-emoji row 3 uses equal letter cells and centered gutters
+PASS: qwerty-emoji has the expected case controls
+PASS: qwerty-emoji visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwerty-left aligns all 38 controls across 5 rows: []
+PASS: qwerty-left row 1 uses equal letter cells and centered gutters
+PASS: qwerty-left row 2 uses equal letter cells and centered gutters
+PASS: qwerty-left row 3 uses equal letter cells and centered gutters
+PASS: qwerty-left has the expected case controls
+PASS: qwerty-left visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwerty-right aligns all 38 controls across 5 rows: []
+PASS: qwerty-right row 1 uses equal letter cells and centered gutters
+PASS: qwerty-right row 2 uses equal letter cells and centered gutters
+PASS: qwerty-right row 3 uses equal letter cells and centered gutters
+PASS: qwerty-right has the expected case controls
+PASS: qwerty-right visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwerty-floating aligns all 40 controls across 6 rows: []
+PASS: qwerty-floating row 1 uses equal letter cells and centered gutters
+PASS: qwerty-floating row 2 uses equal letter cells and centered gutters
+PASS: qwerty-floating row 3 uses equal letter cells and centered gutters
+PASS: qwerty-floating has the expected case controls
+PASS: qwerty-floating visibly paints every letter, including W/M: 
+PASS: qwerty-floating gives Dock enough label space
+PASS: qwertz-compact aligns all 12 controls across 2 rows: []
+PASS: Mode cycle accepts tap
+PASS: qwertz-full aligns all 38 controls across 5 rows: []
+PASS: qwertz-full row 1 uses equal letter cells and centered gutters
+PASS: qwertz-full row 2 uses equal letter cells and centered gutters
+PASS: qwertz-full row 3 uses equal letter cells and centered gutters
+PASS: qwertz-full has the expected case controls
+PASS: qwertz-full visibly paints every letter, including W/M: 
+PASS: qwertz alphabet keys emit their displayed letters
+PASS: qwertz-emoji aligns all 34 controls across 5 rows: []
+PASS: qwertz-emoji row 1 uses equal letter cells and centered gutters
+PASS: qwertz-emoji row 2 uses equal letter cells and centered gutters
+PASS: qwertz-emoji row 3 uses equal letter cells and centered gutters
+PASS: qwertz-emoji has the expected case controls
+PASS: qwertz-emoji visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwertz-left aligns all 38 controls across 5 rows: []
+PASS: qwertz-left row 1 uses equal letter cells and centered gutters
+PASS: qwertz-left row 2 uses equal letter cells and centered gutters
+PASS: qwertz-left row 3 uses equal letter cells and centered gutters
+PASS: qwertz-left has the expected case controls
+PASS: qwertz-left visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwertz-right aligns all 38 controls across 5 rows: []
+PASS: qwertz-right row 1 uses equal letter cells and centered gutters
+PASS: qwertz-right row 2 uses equal letter cells and centered gutters
+PASS: qwertz-right row 3 uses equal letter cells and centered gutters
+PASS: qwertz-right has the expected case controls
+PASS: qwertz-right visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: qwertz-floating aligns all 40 controls across 6 rows: []
+PASS: qwertz-floating row 1 uses equal letter cells and centered gutters
+PASS: qwertz-floating row 2 uses equal letter cells and centered gutters
+PASS: qwertz-floating row 3 uses equal letter cells and centered gutters
+PASS: qwertz-floating has the expected case controls
+PASS: qwertz-floating visibly paints every letter, including W/M: 
+PASS: qwertz-floating gives Dock enough label space
+PASS: azerty-compact aligns all 12 controls across 2 rows: []
+PASS: Mode cycle accepts tap
+PASS: azerty-full aligns all 38 controls across 5 rows: []
+PASS: azerty-full row 1 uses equal letter cells and centered gutters
+PASS: azerty-full row 2 uses equal letter cells and centered gutters
+PASS: azerty-full row 3 uses equal letter cells and centered gutters
+PASS: azerty-full has the expected case controls
+PASS: azerty-full visibly paints every letter, including W/M: 
+PASS: azerty alphabet keys emit their displayed letters
+PASS: azerty-emoji aligns all 34 controls across 5 rows: []
+PASS: azerty-emoji row 1 uses equal letter cells and centered gutters
+PASS: azerty-emoji row 2 uses equal letter cells and centered gutters
+PASS: azerty-emoji row 3 uses equal letter cells and centered gutters
+PASS: azerty-emoji has the expected case controls
+PASS: azerty-emoji visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: azerty-left aligns all 38 controls across 5 rows: []
+PASS: azerty-left row 1 uses equal letter cells and centered gutters
+PASS: azerty-left row 2 uses equal letter cells and centered gutters
+PASS: azerty-left row 3 uses equal letter cells and centered gutters
+PASS: azerty-left has the expected case controls
+PASS: azerty-left visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: azerty-right aligns all 38 controls across 5 rows: []
+PASS: azerty-right row 1 uses equal letter cells and centered gutters
+PASS: azerty-right row 2 uses equal letter cells and centered gutters
+PASS: azerty-right row 3 uses equal letter cells and centered gutters
+PASS: azerty-right has the expected case controls
+PASS: azerty-right visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: azerty-floating aligns all 40 controls across 6 rows: []
+PASS: azerty-floating row 1 uses equal letter cells and centered gutters
+PASS: azerty-floating row 2 uses equal letter cells and centered gutters
+PASS: azerty-floating row 3 uses equal letter cells and centered gutters
+PASS: azerty-floating has the expected case controls
+PASS: azerty-floating visibly paints every letter, including W/M: 
+PASS: azerty-floating gives Dock enough label space
+PASS: alphabetical-compact aligns all 12 controls across 2 rows: []
+PASS: Mode cycle accepts tap
+PASS: alphabetical-full aligns all 38 controls across 5 rows: []
+PASS: alphabetical-full row 1 uses equal letter cells and centered gutters
+PASS: alphabetical-full row 2 uses equal letter cells and centered gutters
+PASS: alphabetical-full row 3 uses equal letter cells and centered gutters
+PASS: alphabetical-full has the expected case controls
+PASS: alphabetical-full visibly paints every letter, including W/M: 
+PASS: alphabetical alphabet keys emit their displayed letters
+PASS: alphabetical-emoji aligns all 34 controls across 5 rows: []
+PASS: alphabetical-emoji row 1 uses equal letter cells and centered gutters
+PASS: alphabetical-emoji row 2 uses equal letter cells and centered gutters
+PASS: alphabetical-emoji row 3 uses equal letter cells and centered gutters
+PASS: alphabetical-emoji has the expected case controls
+PASS: alphabetical-emoji visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: alphabetical-left aligns all 38 controls across 5 rows: []
+PASS: alphabetical-left row 1 uses equal letter cells and centered gutters
+PASS: alphabetical-left row 2 uses equal letter cells and centered gutters
+PASS: alphabetical-left row 3 uses equal letter cells and centered gutters
+PASS: alphabetical-left has the expected case controls
+PASS: alphabetical-left visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: alphabetical-right aligns all 38 controls across 5 rows: []
+PASS: alphabetical-right row 1 uses equal letter cells and centered gutters
+PASS: alphabetical-right row 2 uses equal letter cells and centered gutters
+PASS: alphabetical-right row 3 uses equal letter cells and centered gutters
+PASS: alphabetical-right has the expected case controls
+PASS: alphabetical-right visibly paints every letter, including W/M: 
+PASS: Mode cycle accepts tap
+PASS: alphabetical-floating aligns all 40 controls across 6 rows: []
+PASS: alphabetical-floating row 1 uses equal letter cells and centered gutters
+PASS: alphabetical-floating row 2 uses equal letter cells and centered gutters
+PASS: alphabetical-floating row 3 uses equal letter cells and centered gutters
+PASS: alphabetical-floating has the expected case controls
+PASS: alphabetical-floating visibly paints every letter, including W/M: 
+PASS: alphabetical-floating gives Dock enough label space
+PASS: Mode cycle accepts tap
+PASS: Mode cycle accepts tap
+PASS: punctuation aligns all 39 controls across 5 rows: []
+PASS: Primary symbol keys each insert their displayed character
+PASS: special-symbols aligns all 39 controls across 5 rows: []
+PASS: Secondary symbol keys each insert their displayed character
+PASS: number-pad aligns all 23 controls across 5 rows: []
+PASS: Number pad ABC caption paints its final C instead of an ellipsis
+PASS: Number pad zero remains centered below five
+PASS: Calculator operators remain scrollable
+PASS: Calculator parentheses remain reachable
+PASS: email aligns all 34 controls across 4 rows: []
+PASS: email row 1 uses equal letter cells and centered gutters
+PASS: email row 2 uses equal letter cells and centered gutters
+PASS: email row 3 uses equal letter cells and centered gutters
+PASS: email has the expected case controls
+PASS: email visibly paints every letter, including W/M: 
+PASS: email omits voice controls
+PASS: password aligns all 33 controls across 4 rows: []
+PASS: password row 1 uses equal letter cells and centered gutters
+PASS: password row 2 uses equal letter cells and centered gutters
+PASS: password row 3 uses equal letter cells and centered gutters
+PASS: password has the expected case controls
+PASS: password visibly paints every letter, including W/M: 
+PASS: password omits voice controls
+PASS: numeric-field aligns all 19 controls across 4 rows: []
+PASS: numeric-field omits voice controls
+PASS: numeric-field tools key opens its menu with a tap
+PASS: numeric-field tools menu dismisses before the next input check
+PASS: phone aligns all 20 controls across 4 rows: []
+PASS: phone omits voice controls
+PASS: phone tools key opens its menu with a tap
+PASS: phone tools menu dismisses before the next input check
+PASS: Phone pad has one hash and one star key
+PASS: Phone pad omits calculator-only shortcuts
+PASS: Phone zero aligns with middle digits
+PASS: Phone key inserts +
+PASS: Phone key inserts ,
+PASS: Phone key inserts ;
+PASS: Phone key inserts (
+PASS: Phone key inserts )
+PASS: Phone key inserts *
+PASS: Phone key inserts #
+PASS: layout audit completed
+

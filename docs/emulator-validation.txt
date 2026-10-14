@@ -1,0 +1,74 @@
+
+Android model first-load ms: 2170.0432
+Android mean prediction lookup ms: 0.011449250000000001
+Compact strip bounds: Rect(6, 1000 - 714, 1104)
+PASS: Compact letters match initial uppercase input
+PASS: Compact labels switch to lowercase after initial capital
+PASS: Compact input commits Hello: Hello 
+PASS: Bottom actions clear the system navigation controls: Rect(261, 1105 - 517, 1176)
+PASS: Compact strip and bottom actions stay small
+PASS: Idle demo branding removed
+PASS: Space bar fills the bottom row height
+PASS: Action buttons are visually distinct from standard input
+PASS: Hold and release selects a precise letter
+PASS: Hold and drag upward inserts a number
+PASS: Stationary hold opens accent popup é
+PASS: Accent popup appears above the held letter
+PASS: Dragged accent is highlighted é
+PASS: Hold drag and release inserts an accent in one touch
+PASS: Accent popup closes on release
+PASS: Stationary hold opens accent popup é
+PASS: Accent popup appears above the held letter
+PASS: Dragging away cancels accent insertion
+PASS: Compact and full keyboards use the same input colors
+PASS: Full input commits world: Hello world 
+PASS: Expanded actions clear system buttons
+PASS: Expanded mode exposes Compact control
+PASS: Emoji query is visible in search bar
+PASS: Top emoji query row stays available after filtering
+PASS: Filtered emoji query keys remain painted: Rect(8, 760 - 78, 864) pixel=ffdfebe8
+PASS: Emoji search does not modify host editor
+PASS: Search action preserves host message
+PASS: Search result inserts coffee emoji
+PASS: Delete edits emoji query only
+PASS: Query deletion preserves host text
+PASS: Misspelled emoji query finds coffee
+PASS: Hardware typing edits the emoji search field
+PASS: Hardware search preserves host message
+PASS: Password uses full keyboard
+PASS: Password hides emoji shortcut
+PASS: Password hides suggestion hint
+PASS: Theme toggle 1 keeps compact renderer and applies color (actual=ffdfebe8, expected=ffdfebe8)
+PASS: Theme toggle 2 keeps compact renderer and applies color (actual=ff182d30, expected=ff182d30)
+PASS: Theme toggle 3 keeps compact renderer and applies color (actual=ffdfebe8, expected=ffdfebe8)
+PASS: Theme toggle 4 keeps compact renderer and applies color (actual=ff182d30, expected=ff182d30)
+PASS: Swipe right confirms a word and inserts space: Dog 
+PASS: Swipe left erases the composing word
+PASS: Swipe up expands to full keyboard
+PASS: Swipe down hides the keyboard
+PASS: Contextual next-word choice inserts to
+PASS: Space swipe moves cursor without adding a space
+PASS: Cursor panel moves left
+PASS: Cursor panel selects all text
+PASS: Clipboard panel pastes explicit current text
+PASS: Clipboard keeps a session history entry
+PASS: Clear history closes clipboard panel
+PASS: Floating keyboard uses a narrower panel
+PASS: Floating handle moves the panel
+PASS: Floating system controls keep a contrasting backdrop
+PASS: Dock restores full keyboard width
+PASS: Ordinary editor exposes voice button
+Speech provider available: true
+PASS: Reviewed dictation inserts once and clears draft
+PASS: Stationary hold opens accent popup É
+PASS: Accent popup appears above the held letter
+PASS: Dragged accent is highlighted É
+PASS: Expanded uppercase accent matches input case
+PASS: Expanded letters become lowercase after initial capital
+PASS: Later typing preserves an explicitly selected diacritic
+PASS: Private editor hides voice button
+PASS: Private editor hides clipboard history
+PASS: System theme follows night mode true
+PASS: System theme follows night mode false
+PASS: emulator smoke checks completed
+

@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: Apache-2.0
+package org.linekey.keyboard;
+
+import android.content.Context;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+
+/** Native image control: icon size and weight do not depend on the keyboard text font. */
+// Input controls deliberately use the isolated framework KeyboardTheme, not AppCompat widgets.
+@android.annotation.SuppressLint("AppCompatCustomView")
+final class IconButton extends ImageButton {
+  IconButton(Context context) {
+    super(context);
+    setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null);
+  }
+
+  void setIcon(int resource, int color, boolean capsLock) {
+    var drawable =
+        getContext().getDrawable(capsLock ? R.drawable.ic_control_shift_caps : resource).mutate();
+    drawable.setTint(color);
+    setImageDrawable(drawable);
+  }
+}

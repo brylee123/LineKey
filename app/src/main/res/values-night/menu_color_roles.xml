@@ -1,0 +1,27 @@
+<resources>
+  <color name="menu_colorprimary">@color/menu_dark_colorprimary</color>
+  <color name="menu_coloronprimary">@color/menu_dark_coloronprimary</color>
+  <color name="menu_colorprimarycontainer">@color/menu_dark_colorprimarycontainer</color>
+  <color name="menu_coloronprimarycontainer">@color/menu_dark_coloronprimarycontainer</color>
+  <color name="menu_colorsecondary">@color/menu_dark_colorsecondary</color>
+  <color name="menu_coloronsecondary">@color/menu_dark_coloronsecondary</color>
+  <color name="menu_colorsecondarycontainer">@color/menu_dark_colorsecondarycontainer</color>
+  <color name="menu_coloronsecondarycontainer">@color/menu_dark_coloronsecondarycontainer</color>
+  <color name="menu_colortertiary">@color/menu_dark_colortertiary</color>
+  <color name="menu_colorontertiary">@color/menu_dark_colorontertiary</color>
+  <color name="menu_colortertiarycontainer">@color/menu_dark_colortertiarycontainer</color>
+  <color name="menu_colorontertiarycontainer">@color/menu_dark_colorontertiarycontainer</color>
+  <color name="menu_colorsurface">@color/menu_dark_colorsurface</color>
+  <color name="menu_coloronsurface">@color/menu_dark_coloronsurface</color>
+  <color name="menu_colorsurfacevariant">@color/menu_dark_colorsurfacevariant</color>
+  <color name="menu_coloronsurfacevariant">@color/menu_dark_coloronsurfacevariant</color>
+  <color name="menu_colorsurfacecontainerlowest">@color/menu_dark_colorsurfacecontainerlowest</color>
+  <color name="menu_colorsurfacecontainerlow">@color/menu_dark_colorsurfacecontainerlow</color>
+  <color name="menu_colorsurfacecontainer">@color/menu_dark_colorsurfacecontainer</color>
+  <color name="menu_colorsurfacecontainerhigh">@color/menu_dark_colorsurfacecontainerhigh</color>
+  <color name="menu_colorsurfacecontainerhighest">@color/menu_dark_colorsurfacecontainerhighest</color>
+  <color name="menu_coloroutline">@color/menu_dark_coloroutline</color>
+  <color name="menu_coloroutlinevariant">@color/menu_dark_coloroutlinevariant</color>
+  <color name="menu_coloronbackground">@color/menu_dark_coloronbackground</color>
+  <color name="menu_colorbackground">@color/menu_dark_colorbackground</color>
+</resources>
