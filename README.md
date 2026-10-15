@@ -1,6 +1,6 @@
 # LineKey
 
-An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7 prototype.
+An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7.2 prototype.
 
 ## Open in Android Studio
 
@@ -19,7 +19,7 @@ On macOS/Linux: `sh gradlew :core:verifyCore :app:assembleDebug :app:lintDebug`.
 - Staggered compact letter strip based on the supplied screenshot, teal spacebar, highlighted candidates, and full letter keys; four layouts: QWERTY, QWERTZ, AZERTY, alphabetical.
 - Width-adaptive offline spatial / edit-distance predictions with 10,000 independently licensed English frequency entries plus original starter words. Three algorithms were compared on reproducible noisy taps; see the prediction benchmark.
 - Literal spelling always offered beside candidate words; correction on space and punctuation; immediate correction undo with Delete.
-- Case-aware letters, Shift/caps lock, continuous hold/drag/release accent selection, and hold-and-drag upward for numbers/punctuation; compact swipes: right to confirm/space, left to erase a word, up for full mode, down to hide.
+- Case-aware letters, Shift/caps lock, continuous hold/drag/release accent selection, and hold-and-drag upward for numbers/punctuation; compact swipes: left to right to confirm/space, right to left to erase one word, up for full mode, down to hide.
 - Numbers, symbols, 3,781 Unicode emoji entries with English names/keywords, typo-tolerant matching, and a scrollable results grid, Shift, punctuation, editor-aware Enter, keyboard picker, and settings access.
 - Tap the layout button to cycle **Mini → ABC → 123 → #+= → Mini**. Its label shows the next layout. Hold it for tools and settings. Full layouts have one body Delete key and no Compact/Delete shortcuts in the suggestion header. Emoji search has its own body Delete and an ABC return through the layout button.
 - Compact mode uses three rows; no idle branding label. Bottom padding includes IME caption/navigation/gesture insets and a minimum 48dp system-control gutter in every mode.
@@ -97,3 +97,7 @@ Voice buttons and menu entries are absent from email, URL, password, number, pho
 ## 0.7.1 layout consistency review
 
 Key rows align by their bounds rather than glyph baselines, fixing stepped symbol/calculator footers. Expanded and emoji letters share a ten-column grid that fits full, one-handed and floating panels. A uniform letter size keeps wide glyphs visible on narrow panels while preserving 22sp at normal width. Dock and short action captions fit their controls. The phone pad now uses dialing-specific symbols, and number/phone fields have a working tools button. See [individual layout review](docs/LAYOUT_REVIEW.md).
+
+## 0.7.2 typing improvements
+
+Left-to-right compact swipes confirm the current word and add a space. Right-to-left swipes delete one composing or committed word at a time; repeated swipes continue deleting one word each. The suggestions bar scrolls horizontally through up to 32 spelling matches and 16 next-word suggestions. Touch matching now tolerates wider horizontal errors, favors the number of taps, and modestly increases the corpus-frequency preference. See [typing evaluation](docs/TYPING_072.md).

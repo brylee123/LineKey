@@ -36,6 +36,7 @@ final class CompactStrip extends View {
   private final float threshold;
   private final int holdDelay;
   private float downX, downY, activeX = -1;
+  private boolean horizontalSwipe;
   private boolean held, secondary, movedAfterHold, uppercase, accentHold;
   private long pressedAt;
   private final KeyboardColors colors;
@@ -124,6 +125,7 @@ final class CompactStrip extends View {
         downY = e.getY();
         activeX = downX;
         held = false;
+        horizontalSwipe = false;
         accentHold = false;
         pressedAt = android.os.SystemClock.uptimeMillis();
         movedAfterHold = false;
@@ -138,7 +140,16 @@ final class CompactStrip extends View {
         activeX = e.getX();
         float dx = e.getRawX() - downRawX, dy = e.getRawY() - downRawY;
         boolean moved = Math.hypot(dx, dy) > 12 * getResources().getDisplayMetrics().density;
-        if (!held && moved && android.os.SystemClock.uptimeMillis() - pressedAt >= 120) {
+        if (!held && gestures && Math.abs(dx) >= threshold && Math.abs(dx) > Math.abs(dy)) {
+          horizontalSwipe = true;
+          removeCallbacks(hold);
+        }
+        if (!held
+            && !horizontalSwipe
+            && moved
+            && dy < -16 * getResources().getDisplayMetrics().density
+            && Math.abs(dy) > Math.abs(dx)
+            && android.os.SystemClock.uptimeMillis() - pressedAt >= 120) {
           held = true;
           secondary = dy < -16 * getResources().getDisplayMetrics().density;
           movedAfterHold = true;

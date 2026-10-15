@@ -89,7 +89,7 @@ public final class Decoder {
   public List<Candidate> forgiving(
       List<Double> taps, LetterLayout layout, double widthDp, int limit) {
     if (taps.isEmpty()) return List.of();
-    double sigma = Math.max(.045, Math.min(.10, 16 / Math.max(100, widthDp)));
+    double sigma = Math.max(.06, Math.min(.10, 16 / Math.max(100, widthDp)));
     List<Candidate> result = new ArrayList<>();
     double[][] work = new double[4][33];
     for (var entry : vocabulary.entrySet()) {
@@ -97,7 +97,14 @@ public final class Decoder {
       if (Math.abs(word.length() - taps.size()) > 3) continue;
       double cost = forgivingCost(taps, word, layout, sigma, work);
       if (cost / taps.size() <= (taps.size() < 4 ? 1.5 : 2.5))
-        result.add(new Candidate(word, cost, -cost + .12 * Math.log(entry.getValue())));
+        // Preserve the tap count as useful evidence, without excluding missed/repeated taps.
+        result.add(
+            new Candidate(
+                word,
+                cost,
+                -cost
+                    - 2.4 * Math.abs(word.length() - taps.size())
+                    + .16 * Math.log(entry.getValue())));
     }
     result.sort(
         Comparator.comparingDouble(Candidate::score).reversed().thenComparing(Candidate::word));
@@ -154,7 +161,7 @@ public final class Decoder {
     }
     result.sort(
         Comparator.comparingDouble(Candidate::score).reversed().thenComparing(Candidate::word));
-    return result.subList(0, Math.min(3, result.size()));
+    return result.subList(0, Math.min(32, result.size()));
   }
 
   private static String literal(List<Double> taps, LetterLayout layout) {

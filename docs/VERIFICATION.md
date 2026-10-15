@@ -1,3 +1,11 @@
+# LineKey 0.7.2 verification
+
+181 core assertions passed; lint: 0 errors, 14 warnings. The API 37 emulator passed 128 checks each at 360dp and 240dp, including the reported ankrj/quick example with context reranking, scrolling forward/backward through suggestions, left-to-right completion, right-to-left deletion of composing text, repeated single-word deletion with trailing spaces, and empty-editor deletion. Existing accent, emoji, theme, privacy, cursor/clipboard, floating, voice-draft and navigation checks also passed. Logs: emulator-072-standard.txt and emulator-072-narrow.txt.
+
+Reproducible prediction benchmark tasks passed. Results and methodology are in TYPING_072.md; the broader touch tolerance and count prior improve aggregate results on both synthetic test sets. Human typing, other editors/devices and comprehensive accessibility still need validation. The 62-state layout audit below is historical for 0.7.1; it was not rerun for 0.7.2. This build changes the candidate header and decoder while retaining existing key geometry/colors.
+
+## Earlier verification
+
 # LineKey 0.7.1 verification — 2026-10-14
 
 176 core assertions, Android lint 0 errors / 14 warnings. The individual keyboard audit passed 191 assertions at 360dp/light and 191 at 240dp/dark, covering 31 captured states per width. See LAYOUT_REVIEW.md and layout-audit-071-normal.txt / layout-audit-071-narrow.txt. The separately distributed screenshot gallery contains all 62 individual states.

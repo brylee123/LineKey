@@ -40,13 +40,13 @@ final class CompactStrip extends View {
    to see if View#isInEditMode() is false, since that method will return false
    at runtime but true within a user interface editor.
 
-C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:901: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:907: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
     drag.setOnTouchListener(
     ^
-C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:902: Warning: onTouch lambda should call View#performClick when a click is detected [ClickableViewAccessibility]
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:908: Warning: onTouch lambda should call View#performClick when a click is detected [ClickableViewAccessibility]
         (view, event) -> {
         ^
-C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1258: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1264: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
     key.setOnTouchListener(
     ^
 
@@ -57,7 +57,7 @@ C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\
    actions should ideally be placed in View#performClick as some accessibility
    services invoke performClick when a click action should occur.
 
-C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1667: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1681: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
       empty.setText("No matches. Try a name such as heart, coffee, or smile.");
                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\MainActivity.java:162: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
@@ -89,7 +89,7 @@ C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\
 C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\AccentPopup.java:86: Warning: Use "Gravity.START" instead of "Gravity.LEFT" to ensure correct behavior in right-to-left locales [RtlHardcoded]
         anchor, Gravity.TOP | Gravity.LEFT, x - windowOrigin[0], y - windowOrigin[1]);
                                       ~~~~
-C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:322: Warning: Use "Gravity.START" instead of "Gravity.LEFT" to ensure correct behavior in right-to-left locales [RtlHardcoded]
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:324: Warning: Use "Gravity.START" instead of "Gravity.LEFT" to ensure correct behavior in right-to-left locales [RtlHardcoded]
       box.gravity = Gravity.BOTTOM | Gravity.LEFT;
                                              ~~~~
 

@@ -12,3 +12,15 @@ val benchmarkPredictions by tasks.registering(JavaExec::class) {
     classpath = sourceSets["test"].runtimeClasspath
     mainClass.set("org.linekey.core.PredictionBenchmark")
 }
+
+val benchmarkTapCount by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("org.linekey.core.TapCountBenchmark")
+}
+
+val benchmarkSmallScreens by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("org.linekey.core.SmallScreenBenchmark")
+}

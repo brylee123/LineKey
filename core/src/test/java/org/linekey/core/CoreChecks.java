@@ -139,6 +139,21 @@ public final class CoreChecks {
     check(
         KeyboardMode.SYMBOLS.nextLabel(true).equals("Mini"),
         "Symbols button names next compact layout");
+    List<Double> sloppyQuick = new ArrayList<>();
+    for (char letter : "ankrj".toCharArray()) sloppyQuick.add(qwerty.center(letter));
+    for (double width : new double[] {360, 240, 180}) {
+      check(
+          decoder.forgiving(sloppyQuick, qwerty, width, 32).get(0).word().equals("quick"),
+          "Sloppy five-tap ankrj suggests quick at " + width + "dp");
+    }
+    List<Double> commonTaps = new java.util.ArrayList<>();
+    for (char letter : "there".toCharArray()) commonTaps.add(qwerty.center(letter));
+    check(
+        decoder.forgiving(commonTaps, qwerty, 240, 32).size() > 4,
+        "Compact predictions retain a scrollable shortlist");
+    check(
+        decoder.full("hello").get(0).word().equals("hello"),
+        "Full exact spelling survives frequency weighting");
     System.out.println(
         "PASS: "
             + assertions

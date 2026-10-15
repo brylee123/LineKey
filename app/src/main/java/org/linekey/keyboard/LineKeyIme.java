@@ -18,6 +18,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.widget.PopupMenu;
@@ -44,6 +45,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   private String composingContext = "<s>";
   private FieldPolicy policy = FieldPolicy.from(1, 0);
   private LinearLayout keyboard, suggestions, precision;
+  private HorizontalScrollView suggestionScroll;
   private FrameLayout container;
   private View navigationBackdrop;
   private CompactStrip letterStrip;
@@ -354,7 +356,11 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
     if (compactSurface()) addShiftButton(candidateBar, 1);
     suggestions = newKeyRow();
     suggestions.setOrientation(LinearLayout.HORIZONTAL);
-    candidateBar.addView(suggestions, new LinearLayout.LayoutParams(0, -2, 5));
+    suggestionScroll = new HorizontalScrollView(this);
+    suggestionScroll.setContentDescription("Word suggestions. Swipe to see more matches.");
+    suggestionScroll.setHorizontalScrollBarEnabled(false);
+    suggestionScroll.addView(suggestions, new HorizontalScrollView.LayoutParams(-2, -2));
+    candidateBar.addView(suggestionScroll, new LinearLayout.LayoutParams(0, -2, 5));
     if (compactSurface()) addDeleteButton(candidateBar, 1);
     if (policy.voiceAllowed()) {
       addIconButton(candidateBar, R.drawable.ic_control_mic, "Voice input", this::voiceInput, .7f);
@@ -1430,7 +1436,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
                 letterStrip == null
                     ? 360
                     : letterStrip.getWidth() / getResources().getDisplayMetrics().density,
-                16)
+                32)
             : decoder.full(composingText.toString());
     if (languageModel != null
         && preferences.bool("contextual", true)
@@ -1456,13 +1462,14 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   private void updateSuggestions() {
     if (suggestions == null) return;
     suggestions.removeAllViews();
+    suggestionScroll.scrollTo(0, 0);
     if (policy.privateField() || policy.literal()) return;
     if (composingText.length() == 0) {
       if (languageModel != null && preferences.bool("next_words", true) && !emoji) {
         suggestions.setVisibility(View.VISIBLE);
-        for (var prediction : languageModel.next(predictionContext(), 3)) {
+        for (var prediction : languageModel.next(predictionContext(), 16)) {
           String word = caseWord(prediction.word());
-          addButton(suggestions, word, () -> choose(word), 1, KeyRole.SUGGESTION);
+          addSuggestion(word);
         }
       } else suggestions.setVisibility(View.INVISIBLE);
       return;
@@ -1470,19 +1477,26 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
     suggestions.setVisibility(View.VISIBLE);
     // Literal is always offered, including unknown words.
     String literal = composingText.toString();
-    Button literalButton =
-        addButton(suggestions, literal, () -> choose(literal), 1, KeyRole.SUGGESTION);
+    Button literalButton = addSuggestion(literal);
     if (!candidates.isEmpty() && candidates.get(0).word().equalsIgnoreCase(literal))
       highlight(literalButton);
-    int displayed = 0;
     for (Decoder.Candidate c : candidates) {
-      if (displayed >= 3) break;
       String word = caseWord(c.word());
       if (word.equals(literal)) continue;
-      displayed++;
-      Button candidate = addButton(suggestions, word, () -> choose(word), 1, KeyRole.SUGGESTION);
+      Button candidate = addSuggestion(word);
       if (c == candidates.get(0)) highlight(candidate);
     }
+  }
+
+  private Button addSuggestion(String word) {
+    Button button = addButton(suggestions, word, () -> choose(word), 0, KeyRole.SUGGESTION);
+    LinearLayout.LayoutParams bounds = (LinearLayout.LayoutParams) button.getLayoutParams();
+    bounds.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+    bounds.weight = 0;
+    button.setLayoutParams(bounds);
+    button.setMinWidth(dp(64));
+    button.setPadding(dp(12), 0, dp(12), 0);
+    return button;
   }
 
   private void highlight(Button button) {
@@ -1751,12 +1765,13 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
       ic.commitText("", 1);
       return;
     }
-    CharSequence before = ic.getTextBeforeCursor(128, 0);
+    CharSequence before = ic.getTextBeforeCursor(4096, 0);
     if (before == null) return;
     int n = before.length(), i = n;
     while (i > 0 && Character.isWhitespace(before.charAt(i - 1))) i--;
     while (i > 0 && !Character.isWhitespace(before.charAt(i - 1))) i--;
     ic.deleteSurroundingText(n - i, 0);
+    updateSuggestions();
   }
 
   private String actionLabel() {

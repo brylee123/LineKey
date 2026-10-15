@@ -6,8 +6,8 @@ android {
         applicationId = "org.linekey.keyboard"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "0.7.1"
+        versionCode = 11
+        versionName = "0.7.2"
         testInstrumentationRunner = "org.linekey.keyboard.KeyboardSmokeTest"
     }
     compileOptions {

@@ -5,9 +5,6 @@
 > Task :core:compileJava UP-TO-DATE
 > Task :core:processResources UP-TO-DATE
 > Task :core:classes UP-TO-DATE
-> Task :core:compileTestJava UP-TO-DATE
-> Task :core:processTestResources NO-SOURCE
-> Task :core:testClasses UP-TO-DATE
 > Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :app:generateDebugResValues UP-TO-DATE
 > Task :app:mapDebugSourceSetPaths UP-TO-DATE
@@ -20,6 +17,9 @@
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core:compileTestJava
+> Task :core:processTestResources NO-SOURCE
+> Task :core:testClasses
 > Task :app:processDebugResources UP-TO-DATE
 > Task :app:mergeDebugShaders UP-TO-DATE
 > Task :app:compileDebugShaders NO-SOURCE
@@ -61,7 +61,43 @@
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 
 > Task :core:verifyCore
-PASS: 176 core assertions; starter vocabulary: 10007 words
+PASS: 181 core assertions; starter vocabulary: 10007 words
+
+> Task :core:benchmarkTapCount
+width,noise,cases,top1,top3,shorter_top1
+360,12,160,138,156,0
+360,18,160,98,139,0
+240,12,160,102,137,0
+240,18,160,55,78,2
+180,12,160,76,113,0
+180,18,160,35,64,1
+
+> Task :core:benchmarkSmallScreens
+split,width_dp,noise_dp,algorithm,words,top1,top3,mean_ms
+validation,360,12,previous,80,49,59,5.862
+validation,360,12,adaptive,80,51,65,4.499
+validation,360,18,previous,80,27,42,5.243
+validation,360,18,adaptive,80,39,55,3.400
+validation,240,12,previous,80,26,39,4.533
+validation,240,12,adaptive,80,38,53,3.385
+validation,240,18,previous,80,7,9,4.711
+validation,240,18,adaptive,80,20,34,3.370
+validation,180,12,previous,80,7,19,4.545
+validation,180,12,adaptive,80,25,44,3.663
+validation,180,18,previous,80,2,2,4.517
+validation,180,18,adaptive,80,11,23,3.613
+heldout,360,12,previous,160,96,126,4.246
+heldout,360,12,adaptive,160,103,124,3.512
+heldout,360,18,previous,160,59,82,4.285
+heldout,360,18,adaptive,160,81,106,3.352
+heldout,240,12,previous,160,54,76,4.425
+heldout,240,12,adaptive,160,82,109,3.341
+heldout,240,18,previous,160,19,29,4.428
+heldout,240,18,adaptive,160,37,64,3.353
+heldout,180,12,previous,160,27,35,4.286
+heldout,180,12,adaptive,160,61,88,3.457
+heldout,180,18,previous,160,7,9,4.335
+heldout,180,18,adaptive,160,30,53,3.471
 
 > Task :core:jar UP-TO-DATE
 > Task :app:compileDebugJavaWithJavac UP-TO-DATE
@@ -75,24 +111,24 @@ PASS: 176 core assertions; starter vocabulary: 10007 words
 > Task :app:createDebugApkListingFileRedirect UP-TO-DATE
 > Task :app:assembleDebug UP-TO-DATE
 > Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
-> Task :app:compileDebugAndroidTestJavaWithJavac
-> Task :app:dexBuilderDebugAndroidTest
+> Task :app:compileDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderDebugAndroidTest UP-TO-DATE
 > Task :app:mergeDebugAndroidTestGlobalSynthetics UP-TO-DATE
 > Task :app:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexDebugAndroidTest UP-TO-DATE
 > Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
 > Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
-> Task :app:mergeProjectDexDebugAndroidTest
-> Task :app:generateDebugAndroidTestLintModel
+> Task :app:packageDebugAndroidTest UP-TO-DATE
+> Task :app:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAndroidTestLintModel UP-TO-DATE
 > Task :app:generateDebugLintReportModel UP-TO-DATE
 > Task :app:generateDebugUnitTestLintModel UP-TO-DATE
 > Task :app:lintAnalyzeDebug UP-TO-DATE
+> Task :app:lintAnalyzeDebugAndroidTest UP-TO-DATE
 > Task :app:lintAnalyzeDebugUnitTest UP-TO-DATE
-> Task :app:packageDebugAndroidTest
-> Task :app:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
-> Task :app:assembleDebugAndroidTest
-> Task :app:lintAnalyzeDebugAndroidTest
 > Task :app:lintReportDebug UP-TO-DATE
 > Task :app:lintDebug
 
-BUILD SUCCESSFUL in 3s
-72 actionable tasks: 8 executed, 64 up-to-date
+BUILD SUCCESSFUL in 43s
+74 actionable tasks: 5 executed, 69 up-to-date

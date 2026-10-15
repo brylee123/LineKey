@@ -308,6 +308,36 @@ public final class KeyboardSmokeTest extends Instrumentation {
       focus(editor);
       strip = waitForStrip();
       strip.getBoundsInScreen(bounds);
+      for (char letter : "ankrj".toCharArray())
+        tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
+      check(
+          findImeText("Quick") != null || findImeText("quick") != null,
+          "Sloppy ankrj exposes quick among visible context-ranked suggestions");
+      swipe(
+          bounds.exactCenterX(),
+          bounds.exactCenterY(),
+          bounds.exactCenterX() - 140,
+          bounds.exactCenterY());
+      for (char letter : "there".toCharArray())
+        tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
+      AccessibilityNodeInfo suggestionList = findImeNode("Word suggestions.", true);
+      check(
+          suggestionList != null && suggestionList.isScrollable(),
+          "Suggestions expose a horizontal scrolling list");
+      check(
+          suggestionList.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD),
+          "Additional matches scroll into view");
+      waitForIdleSync();
+      SystemClock.sleep(300);
+      suggestionList = findImeNode("Word suggestions.", true);
+      check(
+          (suggestionList.getActions() & AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) != 0,
+          "Suggestions can scroll back to the best matches");
+      swipe(
+          bounds.exactCenterX(),
+          bounds.exactCenterY(),
+          bounds.exactCenterX() - 140,
+          bounds.exactCenterY());
       for (char letter : "dog".toCharArray())
         tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
       swipe(
@@ -317,7 +347,7 @@ public final class KeyboardSmokeTest extends Instrumentation {
           bounds.exactCenterY());
       check(
           readText(editor).equalsIgnoreCase("dog "),
-          "Swipe right confirms a word and inserts space: " + readText(editor));
+          "Left-to-right swipe confirms a word and inserts space: " + readText(editor));
       strip = waitForStrip();
       strip.getBoundsInScreen(bounds);
       tap(bounds.left + (float) layout.center('x') * bounds.width(), bounds.exactCenterY());
@@ -326,7 +356,21 @@ public final class KeyboardSmokeTest extends Instrumentation {
           bounds.exactCenterY(),
           bounds.exactCenterX() - 140,
           bounds.exactCenterY());
-      check(readText(editor).equalsIgnoreCase("dog "), "Swipe left erases the composing word");
+      check(
+          readText(editor).equalsIgnoreCase("dog "),
+          "Right-to-left swipe erases the composing word");
+      runOnMainSync(() -> editor.getText().replace(0, editor.length(), "one two three  "));
+      waitForIdleSync();
+      for (String remaining : new String[] {"one two ", "one ", "", ""}) {
+        swipe(
+            bounds.exactCenterX(),
+            bounds.exactCenterY(),
+            bounds.exactCenterX() - 140,
+            bounds.exactCenterY());
+        check(
+            readText(editor).equals(remaining),
+            "Repeated right-to-left swipe removes one committed word: " + remaining);
+      }
       swipe(
           bounds.exactCenterX(),
           bounds.exactCenterY(),
