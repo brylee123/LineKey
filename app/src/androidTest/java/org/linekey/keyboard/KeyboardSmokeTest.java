@@ -80,6 +80,33 @@ public final class KeyboardSmokeTest extends Instrumentation {
       new Preferences(getTargetContext()).set("caps", true);
       new Preferences(getTargetContext()).set("gesture_distance", 48);
       new Preferences(getTargetContext()).set("floating", false);
+      long dictionaryStart = System.nanoTime();
+      var dictionary = new org.linekey.core.Decoder();
+      results
+          .append("Android dictionary entries: ")
+          .append(dictionary.seedSize())
+          .append(" first-load ms: ")
+          .append((System.nanoTime() - dictionaryStart) / 1e6)
+          .append('\n');
+      java.util.List<Double> lookupTimes = new java.util.ArrayList<>();
+      var runtimeLayout = new LetterLayout(0);
+      for (String word : java.util.List.of("install", "keyboard", "application", "permission"))
+        for (int length : new int[] {2, 4, word.length()}) {
+          java.util.List<Double> samples = new java.util.ArrayList<>();
+          for (char c : word.substring(0, length).toCharArray())
+            samples.add(runtimeLayout.center(c));
+          long started = System.nanoTime();
+          dictionary.forgiving(samples, runtimeLayout, 240, 32);
+          lookupTimes.add((System.nanoTime() - started) / 1e6);
+        }
+      java.util.Collections.sort(lookupTimes);
+      results
+          .append("Android compact lookup sample p50/p95 ms: ")
+          .append(lookupTimes.get(lookupTimes.size() / 2))
+          .append(" / ")
+          .append(lookupTimes.get((int) Math.ceil(lookupTimes.size() * .95) - 1))
+          .append('\n');
+      check(dictionary.seedSize() >= 170000, "Android loads the expanded 170k dictionary");
       long modelStart = System.nanoTime();
       var model = org.linekey.core.LanguageModel.get();
       results
@@ -318,6 +345,18 @@ public final class KeyboardSmokeTest extends Instrumentation {
           bounds.exactCenterY(),
           bounds.exactCenterX() - 140,
           bounds.exactCenterY());
+      for (String raw : java.util.List.of("insgzoo", "inxtzoo")) {
+        for (char letter : raw.toCharArray())
+          tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
+        check(
+            findImeText("Install") != null || findImeText("install") != null,
+            "Expanded vocabulary visibly suggests install for " + raw);
+        swipe(
+            bounds.exactCenterX(),
+            bounds.exactCenterY(),
+            bounds.exactCenterX() - 140,
+            bounds.exactCenterY());
+      }
       for (char letter : "there".toCharArray())
         tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
       AccessibilityNodeInfo suggestionList = findImeNode("Word suggestions.", true);

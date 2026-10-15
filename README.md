@@ -1,6 +1,6 @@
 # LineKey
 
-An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7.2 prototype.
+An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7.3 prototype.
 
 ## Open in Android Studio
 
@@ -17,7 +17,7 @@ On macOS/Linux: `sh gradlew :core:verifyCore :app:assembleDebug :app:lintDebug`.
 ## Available now
 
 - Staggered compact letter strip based on the supplied screenshot, teal spacebar, highlighted candidates, and full letter keys; four layouts: QWERTY, QWERTZ, AZERTY, alphabetical.
-- Width-adaptive offline spatial / edit-distance predictions with 10,000 independently licensed English frequency entries plus original starter words. Three algorithms were compared on reproducible noisy taps; see the prediction benchmark.
+- Width-adaptive offline spatial / edit-distance predictions with 170,000 independently licensed English frequency entries plus original starter words. Three algorithms were compared on reproducible noisy taps; see the prediction benchmark.
 - Literal spelling always offered beside candidate words; correction on space and punctuation; immediate correction undo with Delete.
 - Case-aware letters, Shift/caps lock, continuous hold/drag/release accent selection, and hold-and-drag upward for numbers/punctuation; compact swipes: left to right to confirm/space, right to left to erase one word, up for full mode, down to hide.
 - Numbers, symbols, 3,781 Unicode emoji entries with English names/keywords, typo-tolerant matching, and a scrollable results grid, Shift, punctuation, editor-aware Enter, keyboard picker, and settings access.
@@ -101,3 +101,7 @@ Key rows align by their bounds rather than glyph baselines, fixing stepped symbo
 ## 0.7.2 typing improvements
 
 Left-to-right compact swipes confirm the current word and add a space. Right-to-left swipes delete one composing or committed word at a time; repeated swipes continue deleting one word each. The suggestions bar scrolls horizontally through up to 32 spelling matches and 16 next-word suggestions. Touch matching now tolerates wider horizontal errors, favors the number of taps, and modestly increases the corpus-frequency preference. See [typing evaluation](docs/TYPING_072.md).
+
+## 0.7.3 vocabulary expansion
+
+The bundled English frequency list now contains 170,000 entries, including install/installs/installing. The spatial decoder uses length indexing, shared immutable vocabulary, cached letter losses and bounded candidate selection; full-key search uses a bounded edit-distance band. A saturating common-word prior keeps frequent everyday words ahead of low-frequency corpus names without removing those entries. Preparation is reproducible from a pinned, hash-verified upstream file. See [dictionary coverage and measurements](docs/DICTIONARY_073.md).

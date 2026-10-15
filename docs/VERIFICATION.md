@@ -1,3 +1,13 @@
+# LineKey 0.7.3 verification
+
+The bundled frequency asset contains exactly 170,000 entries. 192 core assertions passed; Android lint: 0 errors, 14 warnings. Both API 37 emulator widths (360dp and 240dp) passed 131 smoke assertions, including visible install recommendations for insgzoo/inxtzoo and the earlier ankrj/quick case. Logs: emulator-073-standard.txt and emulator-073-narrow.txt.
+
+The optimized search matched exhaustive calibrated search in 202 recorded result-list cases. Dictionary latency, same-count noisy taps, mixed missed/repeated/transposed taps and new-vocabulary coverage were measured. See DICTIONARY_073.md for exact methodology, numbers, and the mixed-noise accuracy tradeoff. No claim is made that a larger dictionary improves every prediction. The context model was not retrained.
+
+One-time Android dictionary load was 550–744 ms in this emulator; cold 12-query compact samples had medians 38–40 ms and p95 103–123 ms. Shared base data is reused across editor restarts. Search remains synchronous, so cold/long-word lookups may cause input delay. Real devices, all editors, comprehensive accessibility, battery and memory behavior are not exhaustively validated. The historical 0.7.1 layout audit below was not rerun; keyboard geometry is unchanged.
+
+## Earlier verification
+
 # LineKey 0.7.2 verification
 
 181 core assertions passed; lint: 0 errors, 14 warnings. The API 37 emulator passed 128 checks each at 360dp and 240dp, including the reported ankrj/quick example with context reranking, scrolling forward/backward through suggestions, left-to-right completion, right-to-left deletion of composing text, repeated single-word deletion with trailing spaces, and empty-editor deletion. Existing accent, emoji, theme, privacy, cursor/clipboard, floating, voice-draft and navigation checks also passed. Logs: emulator-072-standard.txt and emulator-072-narrow.txt.

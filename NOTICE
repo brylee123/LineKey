@@ -9,8 +9,8 @@ English frequency word data (core/src/main/resources/english-frequency.txt):
 Adapted from Hermit Dave / FrequencyWords, OpenSubtitles 2018 English data.
 https://github.com/hermitdave/FrequencyWords
 Data license: Creative Commons Attribution-ShareAlike 4.0 International.
-Changes: first 10,000 lowercase ASCII alphabetic entries, length 1–24;
-counts preserved. See docs/WORD_DATA.md and licenses/CC-BY-SA-4.0.txt.
+Changes: first 170,000 unique lowercase ASCII alphabetic entries, length 1–24;
+counts preserved from the pinned full English list. See docs/WORD_DATA.md and licenses/CC-BY-SA-4.0.txt.
 This data license applies separately from the Apache-2.0 application source.
 
 Emoji names, sequences, and keywords: © Unicode, Inc. Unicode Emoji 16.0 / CLDR 46. Unicode-3.0 license. See docs/EMOJI_DATA.md and licenses/Unicode-3.0.txt.

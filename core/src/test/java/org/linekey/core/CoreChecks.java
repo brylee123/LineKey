@@ -17,6 +17,32 @@ public final class CoreChecks {
 
   public static void main(String[] args) {
     Decoder decoder = new Decoder();
+    check(
+        decoder.seedSize() >= 170000 && decoder.seedSize() < 170050,
+        "Expanded 170k vocabulary is bundled");
+    check(
+        decoder.full("install").get(0).word().equals("install"),
+        "Install is available in full-key mode");
+    LetterLayout regressionLayout = new LetterLayout(0);
+    for (String raw : List.of("insgzoo", "inxtzoo")) {
+      List<Double> taps = new ArrayList<>();
+      for (char letter : raw.toCharArray()) taps.add(regressionLayout.center(letter));
+      for (double width : new double[] {360, 240, 180})
+        check(
+            decoder.forgiving(taps, regressionLayout, width, 32).get(0).word().equals("install"),
+            raw + " predicts install at " + width + "dp");
+    }
+    Decoder personal = new Decoder();
+    personal.addWord("qzxlinekey", 3);
+    check(
+        personal.full("qzxlinekey").get(0).word().equals("qzxlinekey"),
+        "Personal additions update the length index");
+    check(
+        new Decoder().full("qzxlinekey").isEmpty(),
+        "Shared base vocabulary is isolated from personal additions");
+    check(
+        decoder.forgiving(List.of(.5), regressionLayout, 240, 0).isEmpty(),
+        "Empty candidate limit is safe");
     LanguageModel model = LanguageModel.get();
     check(model.pairCount() > 50000, "Corpus-trained context coverage");
     check(model.next("according", 3).get(0).word().equals("to"), "Natural next-word context");

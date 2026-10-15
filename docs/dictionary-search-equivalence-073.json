@@ -1,0 +1,6 @@
+{
+  "cases": 202,
+  "identical_result_lists": true,
+  "scope": "four letter maps, 180/360dp, limits 1/3/32; full typing and personal word updates",
+  "scoring": "identical calibrated scores in exhaustive and optimized implementations"
+}

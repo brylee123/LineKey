@@ -1,0 +1,8 @@
+vocabulary,170000
+load_ms,146.552
+compact_samples,24
+p50_ms,31.287
+p95_ms,103.319
+max_ms,109.807
+full_p50_ms,59.965
+full_max_ms,67.247

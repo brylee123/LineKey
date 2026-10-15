@@ -24,3 +24,15 @@ val benchmarkSmallScreens by tasks.registering(JavaExec::class) {
     classpath = sourceSets["test"].runtimeClasspath
     mainClass.set("org.linekey.core.SmallScreenBenchmark")
 }
+
+val benchmarkDictionary by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("org.linekey.core.DictionaryBenchmark")
+}
+
+val benchmarkVocabularyCoverage by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("org.linekey.core.VocabularyCoverageBenchmark")
+}

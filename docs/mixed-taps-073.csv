@@ -1,0 +1,13 @@
+split,width_dp,noise_dp,algorithm,words,top1,top3,mean_ms
+validation,360,12,adaptive,80,52,64,9.474
+validation,360,18,adaptive,80,38,55,9.482
+validation,240,12,adaptive,80,36,54,8.530
+validation,240,18,adaptive,80,19,31,10.396
+validation,180,12,adaptive,80,27,43,6.962
+validation,180,18,adaptive,80,11,23,7.891
+heldout,360,12,adaptive,160,102,124,9.052
+heldout,360,18,adaptive,160,75,99,10.109
+heldout,240,12,adaptive,160,74,102,9.063
+heldout,240,18,adaptive,160,34,62,14.076
+heldout,180,12,adaptive,160,59,86,7.295
+heldout,180,18,adaptive,160,28,49,7.826
