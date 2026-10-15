@@ -16,7 +16,7 @@ Suggestions update while literal spelling remains composed. Space/punctuation ca
 
 ## Data
 
-No runtime network permission. Personal word counts are local SharedPreferences JSON, bounded to 500 ASCII English words, 2–32 letters each. Learning is disabled by default and suppressed for literal/private fields. The app respects editor requests against personalized learning. It does not log surrounding text or store sentence context. Android app backup is disabled. A manual erase control clears the personal dictionary.
+No runtime network permission. Personal word counts are local SharedPreferences JSON, bounded to 500 ASCII English words, 2–32 letters each. Learning is disabled by default and suppressed for literal/private fields. The app respects editor requests against personalized learning. It never persists or logs surrounding text or sentence context. Recorrection retains a bounded editor snapshot and original candidate lists only in memory for the current input session; see RECORRECTION.md. Android app backup is disabled. A manual erase control clears the personal dictionary.
 
 ## Dependencies
 
@@ -63,3 +63,15 @@ The instrumentation runner accepts `-e layout_audit true` (and optional `-e audi
 ## 0.7.3 vocabulary lookup
 
 The base 170,000-entry vocabulary and length buckets are loaded once into immutable shared data. Each Decoder makes a private map/index copy only if personal learning changes a word. Per-query tap-to-letter losses are reused across candidates; a bounded heap and admissible cost cutoffs avoid sorting/scoring every possible match. Full-key lookup searches only relevant lengths with a bounded edit-distance band. The common-word prior saturates rather than excluding rare entries. See DICTIONARY_073.md for exact parameters, reproducibility, performance and measured accuracy tradeoffs.
+
+## 0.7.4 display spelling and matching letters
+
+Vocabulary entries keep a display spelling and a precomputed letters-only key. All length buckets and edit/touch alignment use the latter; candidates retain the former. WordSpelling normalizes supported apostrophes/hyphens and validates personal entries before they can enter the shared matching code. Plain and punctuated spellings coexist as distinct candidates. The base source remains unchanged; a separately reproducible 332-entry resource supplies joined forms. See PUNCTUATED_WORDS.md for supported symbols, weighting provenance and limitations.
+
+## 0.7.5 recorrection
+
+RecorrectionHistory associates original literal input and up to 32 candidate spellings with each of the latest 64 committed word ranges. A bounded editor snapshot rebases unaffected ranges after text changes; ambiguous/overlapping edits discard uncertain evidence. Selection callbacks and public extracted-text monitor notifications refresh the word at the caret, including external edits that leave the cursor unchanged. Replacements validate a fresh snapshot and use a batched whole-word selection/commit without inserting a space. Undo restores the prior chosen spelling. The cache is cleared on input-session changes and excluded from private/literal editors. It is separate from optional persistent personal-word counts.
+
+## Personalization and segmentation
+
+`Decoder.missingSpaces` performs bounded frequency/context-ranked letter segmentation alongside single-word matching. `Personalization` is a pure Java bounded token/pair learner and suppression filter. `WordStore` persists its validated counts and forgotten words; `LineKeyIme` supplies pre-commit context, privacy gates, weighted explicit learning, immediate-undo snapshots, and the Material forget dialog. See [PERSONALIZATION.md](PERSONALIZATION.md).

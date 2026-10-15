@@ -49,3 +49,7 @@ Completed: explicit Mini/alphabet/numbers/symbols cycle with next-destination ca
 ## 0.7 menus and layouts
 
 Completed: Material 3 menus/settings/panels; rendered Markdown licenses; familiar punctuation/currency/math placements; a calculator-style number pad with scrollable operators; field-specific voice suppression. Input keyboard colors remain separate.
+
+## 0.7.6 update
+
+Completed: bounded missing-space phrase suggestions, optional personal word/pair reranking and next-word candidates, explicit per-word forgetting, manual restoration, and immediate correction-undo learning rollback. Joint typo-plus-space decoding, longer phrase models, and general rejection/undo adaptation remain future work. See PERSONALIZATION.md. Earlier update sections describe the state at those versions.

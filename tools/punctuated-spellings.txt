@@ -1,0 +1,26 @@
+# Independently selected conventional spellings, Apache-2.0.
+# Frequencies are assigned from the pinned source by prepare_dictionary.py;
+# entries absent from that source use the letters-only count, with a floor of 100.
+ain't aren't can't couldn't didn't doesn't don't hadn't hasn't haven't isn't mightn't mustn't needn't oughtn't shan't shouldn't wasn't weren't won't wouldn't
+could've might've must've should've would've couldn't've shouldn't've wouldn't've
+I'm I've I'll I'd I'd've you're you've you'll you'd you'd've he's he'll he'd he'd've she's she'll she'd she'd've it's it'll it'd it'd've we're we've we'll we'd we'd've they're they've they'll they'd they'd've
+that's that'll that'd there's there'll there'd here's what's what'll what're what've what'd who's who'll who'd who've who're where's where'd where're when's when'd why's why'd how's how'd how'll let's y'all y'all're y'all've y'all'd y'all'd've
+someone's somebody's anyone's anybody's everyone's everybody's nobody's nothing's something's one's
+ma'am o'clock c'mon rock'n'roll jack-o'-lantern ne'er-do-well
+children's people's men's women's baby's child's boy's girl's friend's mother's father's dog's cat's teacher's doctor's family's company's world's today's tomorrow's yesterday's
+well-known well-being well-balanced well-behaved well-dressed well-made well-paid well-read well-rounded well-written
+mother-in-law father-in-law brother-in-law sister-in-law son-in-law daughter-in-law parents-in-law mothers-in-law fathers-in-law brothers-in-law sisters-in-law sons-in-law daughters-in-law
+state-of-the-art up-to-date out-of-date over-the-counter off-the-record on-the-job matter-of-fact run-of-the-mill down-to-earth face-to-face one-on-one one-of-a-kind all-in-one do-it-yourself editor-in-chief commander-in-chief
+long-term short-term part-time full-time high-quality high-speed high-tech high-end high-school low-cost low-key low-income
+self-esteem self-confidence self-control self-defense self-employed self-service self-aware self-help self-respect self-care
+old-fashioned good-looking brand-new ice-cream check-in check-out follow-up back-up make-up set-up pick-up drop-off close-up break-in cover-up stand-up grown-up grown-ups
+first-class second-hand first-hand left-hand right-hand left-handed right-handed middle-aged cold-blooded warm-blooded empty-handed open-minded narrow-minded hard-working easy-going good-natured
+ex-wife ex-husband ex-boyfriend ex-girlfriend co-worker co-workers co-founder co-founders co-owner co-owners re-enter re-entry non-profit non-stop non-fiction non-smoking anti-virus anti-inflammatory post-war pre-war
+one-way two-way half-hour half-time last-minute last-second last-ditch day-to-day year-round user-friendly family-friendly child-friendly
+sugar-free gluten-free dairy-free duty-free tax-free risk-free stress-free smoke-free hands-free
+best-selling record-breaking eye-opening eye-catching life-changing life-threatening thought-provoking time-consuming cost-effective
+on-site off-site real-time small-scale large-scale twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine thirty-one
+no-one good-bye bye-bye uh-oh uh-huh mm-hmm ping-pong hip-hop t-shirt t-shirts x-ray x-rays e-mail e-mails wi-fi sci-fi walkie-talkie
+u.s. u.k. u.s.a. e.g. i.e. a.m. p.m. ph.d.
+r&b r&d q&a b&b at&t m&m m&m's and/or either/or yes/no input/output read/write w/o
+c++ c# f#

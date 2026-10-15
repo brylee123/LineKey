@@ -30,11 +30,13 @@ import org.linekey.core.Decoder;
 import org.linekey.core.FieldPolicy;
 import org.linekey.core.KeyboardMode;
 import org.linekey.core.LetterLayout;
+import org.linekey.core.RecorrectionHistory;
 
 public final class LineKeyIme extends InputMethodService implements CompactStrip.Listener {
   private Preferences preferences;
   private WordStore words;
   private Decoder decoder;
+  private org.linekey.core.Personalization personal, undoLearning;
   private LetterLayout layout;
   private org.linekey.core.LanguageModel languageModel;
   private boolean destroyed;
@@ -77,6 +79,11 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   private final StringBuilder composingText = new StringBuilder();
   private final List<Double> touchPositions = new ArrayList<>();
   private List<Decoder.Candidate> candidates = java.util.Collections.emptyList();
+  private static final int CORRECTION_TEXT_TOKEN = 0x4c4b;
+  private final RecorrectionHistory correctionHistory = new RecorrectionHistory();
+  private RecorrectionHistory.Target revisitedWord;
+  private RecorrectionHistory.Entry undoEvidence;
+  private List<String> revisitedSuggestions = List.of();
   private boolean shift, emoji, preciseWord;
   private KeyboardMode mode = KeyboardMode.MINI;
   private String undoRendered = "", undoRaw = "";
@@ -118,6 +125,8 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   @Override
   public void onDestroy() {
     destroyed = true;
+    clearCorrectionHistory();
+    resetComposition();
     preferences.store.unregisterOnSharedPreferenceChangeListener(themeChanges);
     getContentResolver().unregisterContentObserver(systemThemeChanges);
     super.onDestroy();
@@ -126,6 +135,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   private void reload() {
     decoder = new Decoder();
     words.load(decoder);
+    personal = words.read();
     layout = new LetterLayout(preferences.number("layout", 0));
   }
 
@@ -190,6 +200,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   public void onStartInput(EditorInfo info, boolean restarting) {
     super.onStartInput(info, restarting);
     resetComposition();
+    clearCorrectionHistory();
     capsLock = false;
     toolPanel = "";
     selecting = false;
@@ -222,12 +233,14 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
         && preferences.bool("caps", true)
         && getCurrentInputConnection() != null)
       shift = getCurrentInputConnection().getCursorCapsMode(info.inputType) != 0;
+    refreshRevisitedWord();
     renderKeyboard();
   }
 
   @Override
   public void onFinishInput() {
     resetComposition();
+    clearCorrectionHistory();
     undoRendered = "";
     lastSpace = 0;
     dismissAccents();
@@ -243,11 +256,23 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
       resetComposition();
       undoRendered = "";
       lastSpace = 0;
+      refreshRevisitedWord();
       updateSuggestions();
     } else if (composingText.length() == 0) {
       if (undoCursor >= 0 && (newStart != undoCursor || newEnd != undoCursor)) undoRendered = "";
       if (lastSpaceCursor >= 0 && (newStart != lastSpaceCursor || newEnd != lastSpaceCursor))
         lastSpace = 0;
+      refreshRevisitedWord();
+      updateSuggestions();
+    }
+  }
+
+  @Override
+  public void onUpdateExtractedText(int token, ExtractedText text) {
+    super.onUpdateExtractedText(token, text);
+    // An app can change text without moving the cursor. Revalidate those ranges too.
+    if (token == CORRECTION_TEXT_TOKEN && composingText.length() == 0) {
+      refreshRevisitedWord();
       updateSuggestions();
     }
   }
@@ -1345,6 +1370,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void appendVariation(String text) {
+    dismissRevisitedWord();
     InputConnection connection = getCurrentInputConnection();
     if (connection == null) return;
     if (policy.privateField() || policy.literal()) commit(text);
@@ -1394,6 +1420,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void appendLetter(char c, boolean exact) {
+    dismissRevisitedWord();
     InputConnection ic = getCurrentInputConnection();
     if (ic == null) return;
     lastSpace = 0;
@@ -1438,10 +1465,19 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
                     : letterStrip.getWidth() / getResources().getDisplayMetrics().density,
                 32)
             : decoder.full(composingText.toString());
+    if (preferences.bool("missing_spaces", true)) {
+      candidates = new ArrayList<>(candidates);
+      candidates.addAll(
+          decoder.missingSpaces(
+              composingText.toString(), predictionContext(), mode == KeyboardMode.MINI));
+    }
     if (languageModel != null
         && preferences.bool("contextual", true)
         && !policy.privateField()
         && !policy.literal()) candidates = languageModel.rescore(candidates, predictionContext());
+    candidates =
+        personal.rescore(candidates, predictionContext(), preferences.bool("learning", false));
+    if (candidates.size() > 32) candidates = new ArrayList<>(candidates.subList(0, 32));
   }
 
   private String caseWord(String word) {
@@ -1464,10 +1500,18 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
     suggestions.removeAllViews();
     suggestionScroll.scrollTo(0, 0);
     if (policy.privateField() || policy.literal()) return;
+    if (!emoji && revisitedWord != null && composingText.length() == 0) {
+      suggestions.setVisibility(View.VISIBLE);
+      for (String word : revisitedSuggestions)
+        if (!personal.isForgotten(word) || word.equals(revisitedWord.word())) addSuggestion(word);
+      return;
+    }
     if (composingText.length() == 0) {
       if (languageModel != null && preferences.bool("next_words", true) && !emoji) {
         suggestions.setVisibility(View.VISIBLE);
-        for (var prediction : languageModel.next(predictionContext(), 16)) {
+        for (var prediction :
+            personal.next(
+                languageModel, predictionContext(), 16, preferences.bool("learning", false))) {
           String word = caseWord(prediction.word());
           addSuggestion(word);
         }
@@ -1494,6 +1538,41 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
     bounds.width = LinearLayout.LayoutParams.WRAP_CONTENT;
     bounds.weight = 0;
     button.setLayoutParams(bounds);
+    button.setOnLongClickListener(
+        view -> {
+          if (!org.linekey.core.WordSpelling.valid(word)) return false;
+          var forgetDialog =
+              new com.google.android.material.dialog.MaterialAlertDialogBuilder(
+                      MaterialUi.themed(this, preferences.isDark()))
+                  .setTitle("Forget “" + word + "”?")
+                  .setMessage(
+                      "Remove its learned frequency and word pairs, and hide it from predictions."
+                          + " You can still type it literally. Teach it in Settings to restore it.")
+                  .setNegativeButton("Cancel", null)
+                  .setPositiveButton(
+                      "Forget this word",
+                      (dialog, which) -> {
+                        undoLearning = null;
+                        words.forget(word);
+                        reload();
+                        if (composingText.length() > 0) refreshCandidates();
+                        dismissRevisitedWord();
+                        refreshRevisitedWord();
+                        updateSuggestions();
+                      })
+                  .create();
+          android.view.Window window = forgetDialog.getWindow();
+          if (window != null && getWindow() != null) {
+            var attributes = window.getAttributes();
+            attributes.token = getWindow().getWindow().getDecorView().getWindowToken();
+            window.setAttributes(attributes);
+            window.setType(
+                android.view.WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG);
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+          }
+          forgetDialog.show();
+          return true;
+        });
     button.setMinWidth(dp(64));
     button.setPadding(dp(12), 0, dp(12), 0);
     return button;
@@ -1507,10 +1586,18 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
 
   private void choose(String word) {
     if (getCurrentInputConnection() == null) return;
+    if (revisitedWord != null) {
+      replaceRevisitedWord(word);
+      return;
+    }
+    String previous = predictionContext();
     String original = composingText.toString();
+    EditorSnapshot before = readEditorSnapshot();
+    List<String> alternatives = originalAlternatives();
     getCurrentInputConnection().commitText(word + " ", 1);
     getCurrentInputConnection().finishComposingText();
-    learn(word);
+    rememberCommit(before, original, word, alternatives);
+    learn(word, previous, 3);
     undoRaw = original.isEmpty() ? word + " " : original + " ";
     undoRendered = word + " ";
     undoCursor = cursorPosition();
@@ -1522,19 +1609,33 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   private void finishWord(boolean addSpace, boolean correct) {
     if (composingText.length() == 0 || getCurrentInputConnection() == null) return;
     String original = composingText.toString(), word = original;
+    // Space repairs are explicit choices and must not change single-word correction confidence.
+    Decoder.Candidate best = null, runnerUp = null;
+    for (Decoder.Candidate candidate : candidates) {
+      if (candidate.word().contains(" ")) continue;
+      if (best == null) best = candidate;
+      else {
+        runnerUp = candidate;
+        break;
+      }
+    }
     if (correct
         && preferences.bool("correction", true)
         && !preciseWord
-        && !candidates.isEmpty()
-        && candidates.get(0).cost() <= Math.max(1, composingText.length()) * .9
-        && (candidates.size() == 1
-            || candidates.get(0).score() - candidates.get(1).score() >= .5
-            || candidates.get(0).word().equalsIgnoreCase(original)))
-      word = caseWord(candidates.get(0).word());
+        && best != null
+        && best.cost() <= Math.max(1, composingText.length()) * .9
+        && (runnerUp == null
+            || best.score() - runnerUp.score() >= .5
+            || best.word().equalsIgnoreCase(original))) word = caseWord(best.word());
     String tail = addSpace ? " " : "";
+    EditorSnapshot before = readEditorSnapshot();
+    List<String> alternatives = originalAlternatives();
     getCurrentInputConnection().commitText(word + tail, 1);
     getCurrentInputConnection().finishComposingText();
-    learn(word);
+    rememberCommit(before, original, word, alternatives);
+    undoLearning = null;
+    // Unconfirmed automatic corrections must not reinforce their own guesses.
+    if (word.equalsIgnoreCase(original)) learn(word, composingContext, 1);
     undoRaw = original + tail;
     undoRendered = word + tail;
     undoCursor = cursorPosition();
@@ -1542,11 +1643,165 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
     shift = capsLock;
   }
 
-  private void learn(String word) {
+  private record EditorSnapshot(String text, int offset, int start, int end) {}
+
+  private EditorSnapshot readEditorSnapshot() {
+    InputConnection ic = getCurrentInputConnection();
+    if (ic == null || policy.privateField() || policy.literal() || policy.rawKeys()) return null;
+    ExtractedTextRequest request = new ExtractedTextRequest();
+    request.token = CORRECTION_TEXT_TOKEN;
+    request.hintMaxChars = RecorrectionHistory.MAX_TEXT;
+    request.hintMaxLines = 1000;
+    ExtractedText extracted =
+        ic.getExtractedText(request, InputConnection.GET_EXTRACTED_TEXT_MONITOR);
+    if (extracted == null
+        || extracted.text == null
+        || extracted.text.length() > RecorrectionHistory.MAX_TEXT) return null;
+    return new EditorSnapshot(
+        extracted.text.toString(),
+        extracted.startOffset,
+        extracted.startOffset + extracted.selectionStart,
+        extracted.startOffset + extracted.selectionEnd);
+  }
+
+  private void dismissRevisitedWord() {
+    revisitedWord = null;
+    revisitedSuggestions = List.of();
+  }
+
+  private void clearCorrectionHistory() {
+    dismissRevisitedWord();
+    correctionHistory.clear();
+    undoEvidence = null;
+    undoLearning = null;
+  }
+
+  private List<String> originalAlternatives() {
+    List<String> result = new ArrayList<>();
+    for (Decoder.Candidate candidate : candidates) result.add(caseWord(candidate.word()));
+    return result;
+  }
+
+  private void rememberCommit(
+      EditorSnapshot before, String typed, String word, List<String> alternatives) {
+    undoEvidence = null;
+    if (before == null || typed.isEmpty() || before.start() != before.end()) return;
+    correctionHistory.observe(before.text(), before.offset());
+    EditorSnapshot after = readEditorSnapshot();
+    if (after == null) {
+      correctionHistory.clear();
+      return;
+    }
+    correctionHistory.observe(after.text(), after.offset());
+    correctionHistory.remember(before.end() - typed.length(), word, typed, alternatives);
+  }
+
+  private static String caseLike(String word, String original) {
+    if (original.equals(original.toUpperCase(Locale.ROOT))) return word.toUpperCase(Locale.ROOT);
+    return Character.isUpperCase(original.charAt(0))
+        ? Character.toUpperCase(word.charAt(0)) + word.substring(1)
+        : word;
+  }
+
+  private void refreshRevisitedWord() {
+    if (emoji || composingText.length() > 0 || policy.privateField() || policy.literal()) {
+      dismissRevisitedWord();
+      return;
+    }
+    EditorSnapshot snapshot = readEditorSnapshot();
+    if (snapshot == null) {
+      clearCorrectionHistory();
+      return;
+    }
+    correctionHistory.observe(snapshot.text(), snapshot.offset());
+    RecorrectionHistory.Target target = correctionHistory.target(snapshot.start(), snapshot.end());
+    if (java.util.Objects.equals(target, revisitedWord)) return;
+    dismissRevisitedWord();
+    if (target == null) return;
+    revisitedWord = target;
+    java.util.LinkedHashSet<String> options = new java.util.LinkedHashSet<>();
+    options.add(target.word());
+    if (target.evidence() != null) {
+      options.add(target.evidence().typed());
+      options.addAll(target.evidence().alternatives());
+    } else {
+      List<Decoder.Candidate> matches = decoder.full(target.word());
+      if (languageModel != null && preferences.bool("contextual", true)) {
+        String before = snapshot.text().substring(0, target.start() - snapshot.offset());
+        matches =
+            languageModel.rescore(matches, org.linekey.core.LanguageModel.previousWord(before));
+      }
+      for (Decoder.Candidate candidate : matches)
+        options.add(caseLike(candidate.word(), target.word()));
+    }
+    revisitedSuggestions = List.copyOf(options);
+  }
+
+  private void replaceRevisitedWord(String replacement) {
+    RecorrectionHistory.Target expected = revisitedWord;
+    List<String> availableAlternatives = new ArrayList<>(revisitedSuggestions);
+    availableAlternatives.remove(expected.word());
+    EditorSnapshot before = readEditorSnapshot();
+    if (before == null) {
+      clearCorrectionHistory();
+      updateSuggestions();
+      return;
+    }
+    correctionHistory.observe(before.text(), before.offset());
+    RecorrectionHistory.Target current = correctionHistory.target(before.start(), before.end());
+    if (!expected.equals(current)) {
+      dismissRevisitedWord();
+      refreshRevisitedWord();
+      updateSuggestions();
+      return;
+    }
+    InputConnection ic = getCurrentInputConnection();
+    ic.beginBatchEdit();
+    boolean replaced = false;
+    try {
+      if (ic.setSelection(current.start(), current.end())) replaced = ic.commitText(replacement, 1);
+    } finally {
+      ic.endBatchEdit();
+    }
+    dismissRevisitedWord();
+    if (!replaced) {
+      refreshRevisitedWord();
+      updateSuggestions();
+      return;
+    }
+    undoEvidence = null;
+    EditorSnapshot after = readEditorSnapshot();
+    if (after != null) {
+      correctionHistory.observe(after.text(), after.offset());
+      String typed = current.evidence() == null ? current.word() : current.evidence().typed();
+      List<String> alternatives =
+          current.evidence() == null ? availableAlternatives : current.evidence().alternatives();
+      correctionHistory.remember(current.start(), replacement, typed, alternatives);
+      undoEvidence =
+          new RecorrectionHistory.Entry(current.start(), current.word(), typed, alternatives);
+    }
+    undoRaw = current.word();
+    undoRendered = replacement;
+    undoCursor = cursorPosition();
+    lastSpace = 0;
+    String previous =
+        org.linekey.core.LanguageModel.previousWord(
+            before.text().substring(0, current.start() - before.offset()));
+    learn(replacement, previous, 3);
+    refreshRevisitedWord();
+    renderKeyboard();
+  }
+
+  private void learn(String word, String previous, int weight) {
+    undoLearning = null;
+    var beforeLearning = words.read();
     if (!policy.privateField()
         && !policy.literal()
         && preferences.bool("learning", false)
-        && words.learn(word)) reload();
+        && words.learn(word, previous, weight)) {
+      undoLearning = beforeLearning;
+      reload();
+    }
   }
 
   private void resetComposition() {
@@ -1568,6 +1823,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void commit(String text) {
+    dismissRevisitedWord();
     if (getCurrentInputConnection() == null) return;
     lastSpace = 0;
     undoRendered = "";
@@ -1577,6 +1833,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void space() {
+    dismissRevisitedWord();
     InputConnection ic = getCurrentInputConnection();
     if (ic == null) return;
     if (emoji) {
@@ -1688,6 +1945,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void backspace() {
+    dismissRevisitedWord();
     if (emoji) {
       android.text.Editable editable = emojiSearch.getText();
       int start = Math.max(0, emojiSearch.getSelectionStart());
@@ -1722,7 +1980,23 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
       if (before != null && before.toString().equals(undoRendered)) {
         ic.deleteSurroundingText(undoRendered.length(), 0);
         ic.commitText(undoRaw, 1);
+        if (undoLearning != null) {
+          words.save(undoLearning);
+          reload();
+          undoLearning = null;
+        }
+        if (undoEvidence != null) {
+          EditorSnapshot restored = readEditorSnapshot();
+          if (restored != null) {
+            correctionHistory.observe(restored.text(), restored.offset());
+            correctionHistory.remember(
+                undoEvidence.start(), undoRaw, undoEvidence.typed(), undoEvidence.alternatives());
+          }
+        }
+        undoEvidence = null;
         undoRendered = "";
+        refreshRevisitedWord();
+        updateSuggestions();
         return;
       }
     }
@@ -1740,6 +2014,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void deleteWord() {
+    dismissRevisitedWord();
     if (emoji && emojiQuery.length() > 0) {
       emojiQuery.setLength(0);
       updateEmojiResults();
@@ -1791,6 +2066,7 @@ public final class LineKeyIme extends InputMethodService implements CompactStrip
   }
 
   private void enter() {
+    dismissRevisitedWord();
     if (emoji) {
       updateEmojiResults();
       return;

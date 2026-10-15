@@ -1,0 +1,3 @@
+# Preserve the byte hashes used by the reproducible dictionary generator.
+core/src/main/resources/english-frequency.txt text eol=lf
+core/src/main/resources/english-punctuated.txt text eol=lf

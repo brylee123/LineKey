@@ -21,3 +21,7 @@ Source SHA-256:
 - train-00000-of-00001.parquet: e83889baabc497075506f91975be5fac0d45c5290b6b20582c8cd1e853d0c9f7
 - validation-00000-of-00001.parquet: 204929b7ff9d6184953f867dedb860e40aa69c078fc1e54b3baaa8fb28511c4c
 - test-00000-of-00001.parquet: 5f1bea067869d04849c0f975a2b29c4ff47d867f484f5010ea5e861eab246d91
+
+## Optional local adaptation (0.7.6)
+
+The fixed corpus model is unchanged. A separate opt-in learner saves up to 500 word counts and 2,000 adjacent word-pair counts on-device for reranking and next-word suggestions. It does not save editor snapshots or full messages. Explicit word forgetting removes associated learned pairs and suppresses that spelling; all local learning is erasable in Settings. Private/literal fields are excluded.

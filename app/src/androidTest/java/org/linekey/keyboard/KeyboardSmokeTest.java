@@ -33,14 +33,19 @@ public final class KeyboardSmokeTest extends Instrumentation {
   private final StringBuilder results = new StringBuilder();
   private int screenHeight, screenWidth;
   private boolean layoutAudit;
+  private boolean recorrectionOnly, adaptationOnly;
   private boolean auditDark;
   private final org.json.JSONArray auditSnapshots = new org.json.JSONArray();
   private String auditDirectory;
+  private org.linekey.core.Personalization savedLearning;
+  private boolean savedLearningEnabled;
 
   @Override
   public void onCreate(Bundle arguments) {
     super.onCreate(arguments);
     layoutAudit = arguments != null && "true".equals(arguments.getString("layout_audit"));
+    adaptationOnly = arguments != null && "true".equals(arguments.getString("adaptation_only"));
+    recorrectionOnly = arguments != null && "true".equals(arguments.getString("recorrection_only"));
     auditDark = arguments != null && "true".equals(arguments.getString("audit_dark"));
     start();
   }
@@ -77,7 +82,13 @@ public final class KeyboardSmokeTest extends Instrumentation {
 
                 public void onActivityDestroyed(Activity current) {}
               });
+      WordStore baselineWords = new WordStore(getTargetContext());
+      savedLearning = baselineWords.read();
+      savedLearningEnabled = new Preferences(getTargetContext()).bool("learning", false);
+      baselineWords.clear();
       new Preferences(getTargetContext()).set("caps", true);
+      // Baseline checks must not inherit adaptation from an earlier manual/test run.
+      new Preferences(getTargetContext()).set("learning", false);
       new Preferences(getTargetContext()).set("gesture_distance", 48);
       new Preferences(getTargetContext()).set("floating", false);
       long dictionaryStart = System.nanoTime();
@@ -137,6 +148,18 @@ public final class KeyboardSmokeTest extends Instrumentation {
       if (layoutAudit) {
         auditAllLayouts(editor);
         result.putString("stream", "\n" + results + "PASS: layout audit completed\n");
+        finish(Activity.RESULT_OK, result);
+        return;
+      }
+      if (adaptationOnly) {
+        checkAdaptation(editor);
+        result.putString("stream", "\n" + results + "PASS: adaptation checks completed\n");
+        finish(Activity.RESULT_OK, result);
+        return;
+      }
+      if (recorrectionOnly) {
+        checkRecorrection(editor);
+        result.putString("stream", "\n" + results + "PASS: recorrection checks completed\n");
         finish(Activity.RESULT_OK, result);
         return;
       }
@@ -335,8 +358,23 @@ public final class KeyboardSmokeTest extends Instrumentation {
       focus(editor);
       strip = waitForStrip();
       strip.getBoundsInScreen(bounds);
+      checkOmittedPunctuation(editor);
+      checkRecorrection(editor);
+      checkAdaptation(editor);
+      runOnMainSync(
+          () -> {
+            editor.setText("");
+            inputMethods.restartInput(editor);
+          });
+      focus(editor);
+      SystemClock.sleep(350);
+      strip = waitForStrip();
+      strip.getBoundsInScreen(bounds);
       for (char letter : "ankrj".toCharArray())
         tap(bounds.left + (float) layout.center(letter) * bounds.width(), bounds.exactCenterY());
+      check(
+          readText(editor).equalsIgnoreCase("ankrj"),
+          "Sloppy fixture transcribes ankrj: " + readText(editor));
       check(
           findImeText("Quick") != null || findImeText("quick") != null,
           "Sloppy ankrj exposes quick among visible context-ranked suggestions");
@@ -453,6 +491,456 @@ public final class KeyboardSmokeTest extends Instrumentation {
       SystemClock.sleep(100);
     }
     throw new AssertionError("Mode button not visible");
+  }
+
+  @Override
+  public void finish(int resultCode, Bundle result) {
+    if (savedLearning != null) {
+      new WordStore(getTargetContext()).save(savedLearning);
+      new Preferences(getTargetContext()).set("learning", savedLearningEnabled);
+    }
+    super.finish(resultCode, result);
+  }
+
+  private AccessibilityNodeInfo findSuggestion(String word) {
+    AccessibilityNodeInfo list = findImeNode("Word suggestions.", true);
+    for (int page = 0;
+        list != null
+            && page < 25
+            && (list.getActions() & AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) != 0;
+        page++) {
+      if (!list.performAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)) break;
+      waitForIdleSync();
+      SystemClock.sleep(75);
+      list = findImeNode("Word suggestions.", true);
+    }
+    for (int page = 0; page < 40; page++) {
+      AccessibilityNodeInfo candidate = findImeText(word);
+      if (candidate == null)
+        candidate = findImeText(Character.toUpperCase(word.charAt(0)) + word.substring(1));
+      if (candidate != null) return candidate;
+      list = findImeNode("Word suggestions.", true);
+      if (list == null || !list.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) break;
+      waitForIdleSync();
+      SystemClock.sleep(75);
+    }
+    throw new AssertionError("Suggestion did not appear: " + word);
+  }
+
+  private void selectSuggestion(String word) {
+    check(
+        findSuggestion(word).performAction(AccessibilityNodeInfo.ACTION_CLICK),
+        "Choose suggestion " + word);
+    waitForIdleSync();
+    SystemClock.sleep(250);
+  }
+
+  private void tapEditorWord(EditText editor, int offset) {
+    float[] point = new float[2];
+    runOnMainSync(
+        () -> {
+          int[] location = new int[2];
+          editor.getLocationOnScreen(location);
+          android.text.Layout text = editor.getLayout();
+          int line = text.getLineForOffset(offset);
+          point[0] =
+              location[0]
+                  + editor.getTotalPaddingLeft()
+                  + text.getPrimaryHorizontal(offset)
+                  - editor.getScrollX();
+          point[1] =
+              location[1]
+                  + editor.getTotalPaddingTop()
+                  + (text.getLineTop(line) + text.getLineBottom(line)) / 2f
+                  - editor.getScrollY();
+        });
+    tap(point[0], point[1]);
+    SystemClock.sleep(250);
+  }
+
+  private void checkAdaptation(EditText editor) {
+    WordStore store = new WordStore(getTargetContext());
+    var saved = store.read();
+    Preferences prefs = new Preferences(getTargetContext());
+    boolean oldLearning = prefs.bool("learning", false);
+    try {
+      store.clear();
+      prefs.set("learning", true);
+      check(store.learn("qzxlinekey", "use", 3), "Persist personal context");
+      var roundTrip = new WordStore(getTargetContext()).read();
+      check(roundTrip.pairs().get("use\tqzxlinekey") == 3, "Word-pair counts survive store reload");
+      runOnMainSync(() -> editor.setText(""));
+      runOnMainSync(() -> inputMethods.restartInput(editor));
+      focus(editor);
+      SystemClock.sleep(250);
+      returnToMini();
+      pressMode();
+      typeFullLetters("hellp");
+      press("Space");
+      check(
+          readText(editor).equalsIgnoreCase("hello "),
+          "Learning-enabled Space still corrects an unconfirmed guess");
+      check(
+          !store.read().words().containsKey("hello"),
+          "An unconfirmed autocorrection never reinforces its own guess");
+      for (boolean full : new boolean[] {false, true}) {
+        runOnMainSync(
+            () -> {
+              editor.setText("");
+              inputMethods.restartInput(editor);
+            });
+        focus(editor);
+        SystemClock.sleep(250);
+        returnToMini();
+        if (full) pressMode();
+        if (full) typeFullLetters("helloworld");
+        else {
+          Rect strip = new Rect();
+          waitForStrip().getBoundsInScreen(strip);
+          for (char c : "helloworld".toCharArray())
+            tap(
+                strip.left + (float) new LetterLayout(0).center(c) * strip.width(),
+                strip.exactCenterY());
+        }
+        check(
+            readText(editor).equalsIgnoreCase("helloworld"),
+            "Spacing fixture transcribes joined letters: " + readText(editor));
+        selectSuggestion("hello world");
+        check(
+            readText(editor).equalsIgnoreCase("hello world "),
+            "Missing-space phrase inserts in " + (full ? "full" : "Mini"));
+        check(
+            store.read().pairs().containsKey("hello\tworld"),
+            "Chosen phrase learns adjacent tokens");
+        Rect delete = new Rect();
+        waitForKey("⌫").getBoundsInScreen(delete);
+        tap(delete.exactCenterX(), delete.exactCenterY());
+        check(readText(editor).equalsIgnoreCase("helloworld "), "Undo restores joined letters");
+        check(!store.read().pairs().containsKey("hello\tworld"), "Undo rolls back phrase learning");
+      }
+      runOnMainSync(
+          () -> {
+            editor.setText("use ");
+            editor.setSelection(editor.length());
+          });
+      focus(editor);
+      returnToMini();
+      AccessibilityNodeInfo prediction = findSuggestion("qzxlinekey");
+      check(prediction != null, "Learned word pair contributes a next-word suggestion");
+      selectSuggestion("qzxlinekey");
+      check(
+          store.read().pairs().get("use\tqzxlinekey") == 6
+              && !store.read().pairs().containsKey("qzxlinekey\tqzxlinekey"),
+          "Choosing a next word learns the preceding context, not the inserted word itself");
+      runOnMainSync(
+          () -> {
+            editor.setText("use ");
+            editor.setSelection(editor.length());
+          });
+      focus(editor);
+      returnToMini();
+      prediction = findSuggestion("qzxlinekey");
+      check(
+          prediction.performAction(AccessibilityNodeInfo.ACTION_LONG_CLICK),
+          "Suggestion supports long press");
+      SystemClock.sleep(300);
+      AccessibilityNodeInfo forget = null;
+      for (AccessibilityWindowInfo window : automation.getWindows()) {
+        AccessibilityNodeInfo found = findNode(window.getRoot(), "Forget this word", false);
+        if (found != null) forget = found;
+      }
+      check(forget != null, "Material forget dialog opens from IME window");
+      forget.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+      waitForIdleSync();
+      SystemClock.sleep(300);
+      check(store.read().isForgotten("qzxlinekey"), "Forget preference persists");
+      check(
+          !store.read().words().containsKey("qzxlinekey")
+              && !store.read().pairs().containsKey("use\tqzxlinekey"),
+          "Forget removes learned frequency and context");
+      boolean stillSuggested = false;
+      for (AccessibilityWindowInfo window : automation.getWindows()) {
+        if (window.getType() != AccessibilityWindowInfo.TYPE_INPUT_METHOD) continue;
+        stillSuggested |=
+            findNode(window.getRoot(), "qzxlinekey", false) != null
+                || findNode(window.getRoot(), "Qzxlinekey", false) != null;
+      }
+      check(!stillSuggested, "Forgotten next-word suggestion disappears");
+      check(store.learn("qzxlinekey"), "Manual teaching restores forgotten word");
+      check(
+          !store.read().isForgotten("qzxlinekey"),
+          "Manual restoration clears forgotten preference");
+      store.forget("i");
+      check(
+          store.learn("I") && !store.read().isForgotten("i"),
+          "Manual teaching restores one-letter words too");
+      prefs.set("learning", false);
+      int disabledWords = store.size(), disabledPairs = store.read().pairs().size();
+      runOnMainSync(() -> editor.setText(""));
+      focus(editor);
+      returnToMini();
+      pressMode();
+      typeFullLetters("hello");
+      selectSuggestion("hello");
+      check(
+          store.size() == disabledWords && store.read().pairs().size() == disabledPairs,
+          "Learning disabled prevents token and pair collection");
+      prefs.set("learning", true);
+      int beforePrivate = store.size(), pairsBeforePrivate = store.read().pairs().size();
+      EditText password = findEditor("Password · no suggestions or learning");
+      focus(password);
+      waitForKey("q");
+      typeFullLetters("secret");
+      press("Space");
+      check(
+          store.size() == beforePrivate && store.read().pairs().size() == pairsBeforePrivate,
+          "Password input never learns tokens or context");
+      store.clear();
+      check(
+          store.read().words().isEmpty()
+              && store.read().pairs().isEmpty()
+              && store.read().forgotten().isEmpty(),
+          "Erase clears all adaptation data");
+    } finally {
+      store.save(saved);
+      prefs.set("learning", oldLearning);
+      runOnMainSync(() -> editor.setText(""));
+      focus(editor);
+      returnToMini();
+    }
+  }
+
+  private void checkRecorrection(EditText editor) {
+    runOnMainSync(() -> editor.setText(""));
+    focus(editor);
+    returnToMini();
+    Rect strip = new Rect();
+    waitForStrip().getBoundsInScreen(strip);
+    double[] samples = {
+      .1799276459113081,
+      .08584676992198302,
+      .48265731518434524,
+      .2574006819782018,
+      .33315713397792074,
+      .6464690049366381
+    };
+    for (double x : samples) tap(strip.left + (float) x * strip.width(), strip.exactCenterY());
+    check(readText(editor).equalsIgnoreCase("sztech"), "Recorrection fixture transcribes sztech");
+    check(findSuggestion("watch") != null, "Original sztech suggestions include watch");
+    selectSuggestion("eaten");
+    check(readText(editor).equalsIgnoreCase("eaten "), "Initially choose eaten from sztech");
+    waitForStrip().getBoundsInScreen(strip);
+    for (char c : "now".toCharArray())
+      tap(strip.left + (float) new LetterLayout(0).center(c) * strip.width(), strip.exactCenterY());
+    selectSuggestion("now");
+    check(
+        readText(editor).equalsIgnoreCase("eaten now "), "Later typing follows the initial choice");
+    tapEditorWord(editor, 2);
+    check(findSuggestion("sztech") != null, "Tapping eaten restores its original literal input");
+    selectSuggestion("watch");
+    check(
+        readText(editor).equalsIgnoreCase("watch now "),
+        "Mini recorrection replaces only eaten, preserving later words and spacing: "
+            + readText(editor));
+    Rect delete = new Rect();
+    waitForKey("⌫").getBoundsInScreen(delete);
+    tap(delete.exactCenterX(), delete.exactCenterY());
+    check(
+        readText(editor).equalsIgnoreCase("eaten now "),
+        "Delete undoes a recorrection to the previous chosen word");
+    runOnMainSync(() -> editor.setSelection(0, 5));
+    waitForIdleSync();
+    SystemClock.sleep(250);
+    if (findStrip() != null) pressMode();
+    check(findStrip() == null, "Recorrection also runs in full alphabet mode");
+    selectSuggestion("watch");
+    check(
+        readText(editor).equalsIgnoreCase("watch now "),
+        "Whole-word selection can reuse watch after undo");
+    selectSuggestion("watery");
+    check(
+        readText(editor).equalsIgnoreCase("watery now "),
+        "Longer replacement preserves the following word");
+    selectSuggestion("watch");
+    check(readText(editor).equalsIgnoreCase("watch now "), "Shorter replacement preserves spacing");
+    runOnMainSync(() -> editor.getText().insert(0, "Please "));
+    waitForIdleSync();
+    SystemClock.sleep(250);
+    runOnMainSync(() -> editor.getText().append("eaten "));
+    waitForIdleSync();
+    SystemClock.sleep(250);
+    tapEditorWord(editor, 9);
+    check(findSuggestion("sztech") != null, "An edit before the word rebases original evidence");
+    selectSuggestion("eaten");
+    check(
+        readText(editor).equalsIgnoreCase("Please eaten now eaten "),
+        "Replacing an earlier duplicate preserves the later identical word: " + readText(editor));
+    int lastWord = readText(editor).toLowerCase(java.util.Locale.ROOT).lastIndexOf("eaten");
+    tapEditorWord(editor, lastWord + 2);
+    check(
+        findImeText("Sztech") == null && findImeText("sztech") == null,
+        "Another eaten occurrence does not inherit the first word's original trace");
+    tapEditorWord(editor, 9);
+    check(findSuggestion("sztech") != null, "First occurrence still retains its alternatives");
+    runOnMainSync(
+        () -> {
+          editor.getText().replace(8, 9, "x");
+          editor.setSelection(9);
+        });
+    waitForIdleSync();
+    SystemClock.sleep(250);
+    check(
+        findImeText("Sztech") == null && findImeText("sztech") == null,
+        "Editing inside the word invalidates stale original evidence");
+    focus(findEditor("Password · no suggestions or learning"));
+    waitForKey("q");
+    check(
+        findImeText("Sztech") == null && findImeText("sztech") == null,
+        "Private editor does not expose recorrection evidence");
+    runOnMainSync(
+        () -> {
+          editor.setText("hellp, tail");
+          editor.setSelection(2);
+        });
+    focus(editor);
+    waitForStrip();
+    tapEditorWord(editor, 2);
+    selectSuggestion("hello");
+    check(
+        readText(editor).equals("hello, tail"),
+        "Untracked text offers spelling corrections without changing punctuation or spacing");
+    runOnMainSync(() -> editor.setText(""));
+    focus(editor);
+    waitForStrip();
+    pressMode();
+    typeFullLetters("hellp");
+    press("Space");
+    check(
+        readText(editor).equalsIgnoreCase("hello "),
+        "Space automatically corrects hellp: " + readText(editor));
+    tapEditorWord(editor, 2);
+    check(
+        findSuggestion("hellp") != null, "Automatic correction also preserves its original input");
+    selectSuggestion("help");
+    check(
+        readText(editor).equalsIgnoreCase("help "),
+        "Automatic correction alternatives can replace the word later");
+    runOnMainSync(() -> editor.setText(""));
+    focus(editor);
+    waitForStrip();
+  }
+
+  // Suggestion labels can also be single letters; select the actual alphabet row.
+  private AccessibilityNodeInfo findLetterBelow(AccessibilityNodeInfo node, char letter, int top) {
+    if (node == null) return null;
+    Rect bounds = new Rect();
+    node.getBoundsInScreen(bounds);
+    if (node.getText() != null
+        && node.getText().toString().equalsIgnoreCase(String.valueOf(letter))
+        && node.isVisibleToUser()
+        && bounds.top >= top
+        && !bounds.isEmpty()) return node;
+    for (int index = 0; index < node.getChildCount(); index++) {
+      AccessibilityNodeInfo found = findLetterBelow(node.getChild(index), letter, top);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  private void typeFullLetters(String letters) {
+    for (char c : letters.toCharArray()) {
+      AccessibilityNodeInfo key = null;
+      for (int attempt = 0; attempt < 30 && key == null; attempt++) {
+        Rect header = new Rect();
+        AccessibilityNodeInfo suggestions = findImeNode("Word suggestions.", true);
+        if (suggestions != null) suggestions.getBoundsInScreen(header);
+        for (AccessibilityWindowInfo window : automation.getWindows())
+          if (window.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD)
+            key = findLetterBelow(window.getRoot(), c, header.bottom);
+        if (key == null) SystemClock.sleep(100);
+      }
+      if (key == null) throw new AssertionError("Missing full alphabet letter " + c);
+      Rect keyBounds = new Rect();
+      key.getBoundsInScreen(keyBounds);
+      tap(keyBounds.exactCenterX(), keyBounds.exactCenterY());
+    }
+  }
+
+  private void checkOmittedPunctuation(EditText editor) {
+    LetterLayout layout = new LetterLayout(0);
+    for (boolean full : new boolean[] {false, true}) {
+      for (String spelling :
+          java.util.List.of("don't", "well-known", "rock'n'roll", "u.s.a.", "and/or", "r&d")) {
+        runOnMainSync(() -> editor.setText(""));
+        focus(editor);
+        String letters = org.linekey.core.WordSpelling.letters(spelling);
+        if (full) {
+          // Showing the editor can restart input and restore its default Mini mode.
+          SystemClock.sleep(200);
+          if (findStrip() != null) pressMode();
+          check(findStrip() == null, "Omission test is using full alphabet mode");
+          typeFullLetters(letters);
+        } else {
+          Rect stripBounds = new Rect();
+          waitForStrip().getBoundsInScreen(stripBounds);
+          for (char c : letters.toCharArray())
+            tap(
+                stripBounds.left + (float) layout.center(c) * stripBounds.width(),
+                stripBounds.exactCenterY());
+        }
+        AccessibilityNodeInfo candidate = null;
+        for (int page = 0; page < 20; page++) {
+          candidate = findImeText(spelling);
+          if (candidate == null)
+            candidate =
+                findImeText(Character.toUpperCase(spelling.charAt(0)) + spelling.substring(1));
+          if (candidate != null) break;
+          AccessibilityNodeInfo list = findImeNode("Word suggestions.", true);
+          if (list == null || !list.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD))
+            break;
+          waitForIdleSync();
+          SystemClock.sleep(100);
+        }
+        check(
+            candidate != null, (full ? "Full" : "Compact") + " offers punctuation for " + letters);
+        check(candidate.performAction(AccessibilityNodeInfo.ACTION_CLICK), "Select " + spelling);
+        waitForIdleSync();
+        check(
+            readText(editor).equalsIgnoreCase(spelling + " "),
+            "Candidate inserts punctuated spelling: " + readText(editor));
+        // Choosing a word rebuilds the header; wait for its new Delete view, then
+        // inject a real tap rather than invoking an accessibility node being replaced.
+        SystemClock.sleep(200);
+        Rect deleteBounds = new Rect();
+        waitForKey("⌫").getBoundsInScreen(deleteBounds);
+        tap(deleteBounds.exactCenterX(), deleteBounds.exactCenterY());
+        check(
+            readText(editor).equalsIgnoreCase(letters + " "),
+            "Correction undo restores omitted punctuation input");
+      }
+      runOnMainSync(() -> editor.setText(""));
+      focus(editor);
+      if (full) returnToMini();
+    }
+    runOnMainSync(
+        () -> {
+          editor.setText("one mother-in-law rock'n'roll u.s.a. ");
+          editor.setSelection(editor.length());
+        });
+    focus(editor);
+    Rect bounds = new Rect();
+    waitForStrip().getBoundsInScreen(bounds);
+    for (String remaining :
+        new String[] {"one mother-in-law rock'n'roll ", "one mother-in-law ", "one ", ""}) {
+      swipe(
+          bounds.exactCenterX(),
+          bounds.exactCenterY(),
+          bounds.exactCenterX() - 140,
+          bounds.exactCenterY());
+      check(
+          readText(editor).equals(remaining),
+          "Word swipe deletes a whole punctuated word: " + readText(editor));
+    }
   }
 
   private void pressMode() {

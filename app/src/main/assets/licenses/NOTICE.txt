@@ -23,3 +23,10 @@ English bigram data: Wikipedia contributors / WikiText-2, CC BY-SA 3.0. Adapted 
 Material Symbols Rounded control icons: Copyright Google LLC, Apache-2.0. See docs/ICON_DATA.md and licenses/Material-Symbols-Apache-2.0.txt.
 
 Material Components for Android and AndroidX: Copyright The Android Open Source Project, Apache-2.0. Markwon: Copyright Dimitry Ivanov, Apache-2.0. commonmark-java: Copyright commonmark-java authors, BSD 2-Clause. See docs/UI_LIBRARIES.md and bundled licenses.
+
+Supplemental weighted punctuated spellings (core/src/main/resources/english-punctuated.txt):
+Adapted from the same pinned FrequencyWords / OpenSubtitles 2018 English data,
+CC BY-SA 4.0. Independently selected conventional spellings (332 entries);
+exact source counts where available, otherwise letters-only counts with a
+minimum illustrative weight of 100. See docs/PUNCTUATED_WORDS.md.
+The authored spelling inventory and preparation code are Apache-2.0.

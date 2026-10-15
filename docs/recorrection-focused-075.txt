@@ -1,0 +1,45 @@
+
+Android dictionary entries: 170332 first-load ms: 924.855531
+Android compact lookup sample p50/p95 ms: 42.819541 / 104.382815
+PASS: Android loads the expanded 170k dictionary
+Android model first-load ms: 141.967812
+Android mean prediction lookup ms: 0.0025944130000000003
+PASS: Settings use a Material exposed dropdown
+PASS: Material license menu opens a document
+PASS: Bundled Markdown heading is rendered without source markers
+PASS: Markdown links display their readable labels
+PASS: Material document dialog closes
+PASS: Recorrection fixture transcribes sztech
+PASS: Original sztech suggestions include watch
+PASS: Choose suggestion eaten
+PASS: Initially choose eaten from sztech
+PASS: Choose suggestion now
+PASS: Later typing follows the initial choice
+PASS: Tapping eaten restores its original literal input
+PASS: Choose suggestion watch
+PASS: Mini recorrection replaces only eaten, preserving later words and spacing: Watch now 
+PASS: Delete undoes a recorrection to the previous chosen word
+PASS: Mode cycle accepts tap
+PASS: Recorrection also runs in full alphabet mode
+PASS: Choose suggestion watch
+PASS: Whole-word selection can reuse watch after undo
+PASS: Choose suggestion watery
+PASS: Longer replacement preserves the following word
+PASS: Choose suggestion watch
+PASS: Shorter replacement preserves spacing
+PASS: An edit before the word rebases original evidence
+PASS: Choose suggestion eaten
+PASS: Replacing an earlier duplicate preserves the later identical word: Please Eaten now eaten 
+PASS: Another eaten occurrence does not inherit the first word's original trace
+PASS: First occurrence still retains its alternatives
+PASS: Editing inside the word invalidates stale original evidence
+PASS: Private editor does not expose recorrection evidence
+PASS: Choose suggestion hello
+PASS: Untracked text offers spelling corrections without changing punctuation or spacing
+PASS: Mode cycle accepts tap
+PASS: Space automatically corrects hellp
+PASS: Automatic correction also preserves its original input
+PASS: Choose suggestion help
+PASS: Automatic correction alternatives can replace the word later
+PASS: recorrection checks completed
+

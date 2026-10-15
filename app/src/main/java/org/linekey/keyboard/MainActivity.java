@@ -131,6 +131,7 @@ public final class MainActivity extends AppCompatActivity {
     toggle("Swipe gestures in compact mode", "gestures", true);
     slider("Swipe distance (dp)", "gesture_distance", 48, 24, 96, 8);
     slider("Hold for precise letters (ms)", "hold_delay", 450, 250, 1000, 50);
+    toggle("Suggest missing spaces", "missing_spaces", true);
     toggle("Context-aware corrections", "contextual", true);
     toggle("Next-word predictions", "next_words", true);
     heading("Appearance & feel");
@@ -142,13 +143,15 @@ public final class MainActivity extends AppCompatActivity {
     toggle("Key haptics", "haptics", true);
     toggle("System key sounds", "sound", false);
     heading("Personal words");
-    toggle("Learn words on this device", "learning", false);
+    toggle("Learn words and word pairs on this device", "learning", false);
     WordStore words = new WordStore(this);
     TextView count = text(words.size() + " personal words · limit 500", 14);
     paragraph(
-        "Learning is optional and off by default. Passwords, email / URL fields, and editors"
-            + " requesting no personalized learning never teach words. Android backup is disabled"
-            + " for this app.");
+        "Learning is optional and off by default. It stores up to 500 word counts and 2,000"
+            + " adjacent word pairs locally, without saving messages. Explicit choices carry more"
+            + " weight; unconfirmed autocorrections do not teach guesses. Passwords, email / URL"
+            + " fields, and editors requesting no personalized learning never teach words. Android"
+            + " backup is disabled for this app.");
     EditText custom =
         field(
             "Teach an English word",
@@ -160,14 +163,19 @@ public final class MainActivity extends AppCompatActivity {
           if (added) {
             custom.setText("");
             count.setText(words.size() + " personal words · limit 500");
-          } else custom.setError("Use 2–32 English letters; the dictionary has a 500-word limit.");
+          } else
+            custom.setError(
+                "Use 1–32 English letters, optionally joined by apostrophes, hyphens or supported"
+                    + " word symbols; limit 500 words.");
         });
     action(
-        "Erase personal words",
+        "Erase personal learning",
         () ->
             new MaterialAlertDialogBuilder(this)
                 .setTitle("Erase learned words?")
-                .setMessage("This deletes LineKey's personal dictionary on this device.")
+                .setMessage(
+                    "This deletes learned words, word pairs, and forgotten-word preferences on this"
+                        + " device.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton(
                     "Erase",
@@ -183,6 +191,16 @@ public final class MainActivity extends AppCompatActivity {
             + " and release to insert. Drag away to cancel. Hold the small upper lane for numbers"
             + " or symbols, or start an upward drag after a brief hold before the accent popup"
             + " opens. A brief hold and horizontal slide selects precise letters.\n\n"
+            + "Type letters only for contractions and joined words: dont can suggest don't, and"
+            + " wellknown can suggest well-known. Choose the punctuated suggestion to insert it."
+            + " Missing spaces such as helloworld can suggest hello world; select the phrase to"
+            + " insert it. Common dictionary words are protected; space repairs require selecting a"
+            + " suggestion. Long-press a word suggestion to forget it, including learned context."
+            + " Literal input stays available.\n\n"
+            + "Tap inside an earlier word to revisit its suggestions, or select the whole word."
+            + " Choosing a suggestion replaces that word without adding a space. Original"
+            + " alternatives are kept for the latest 64 words in the current field session, in"
+            + " memory only; private and literal fields are excluded.\n\n"
             + "Swipe left to right to confirm and space; right to left to erase one word; up for"
             + " full mode; down to hide. Tap the layout button to cycle Mini, ABC, numbers and"
             + " symbols. It shows the next layout. Hold it for floating mode, cursor and clipboard"

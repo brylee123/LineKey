@@ -1,0 +1,47 @@
+
+Android dictionary entries: 170332 first-load ms: 1247.6166
+Android compact lookup sample p50/p95 ms: 39.7301 / 104.5081
+PASS: Android loads the expanded 170k dictionary
+Android model first-load ms: 116.2096
+Android mean prediction lookup ms: 0.00158136
+PASS: Settings use a Material exposed dropdown
+PASS: Material license menu opens a document
+PASS: Bundled Markdown heading is rendered without source markers
+PASS: Markdown links display their readable labels
+PASS: Material document dialog closes
+PASS: Persist personal context
+PASS: Word-pair counts survive store reload
+PASS: Mode cycle accepts tap
+PASS: Learning-enabled Space still corrects an unconfirmed guess
+PASS: An unconfirmed autocorrection never reinforces its own guess
+PASS: Spacing fixture transcribes joined letters: Helloworld
+PASS: Choose suggestion hello world
+PASS: Missing-space phrase inserts in Mini
+PASS: Chosen phrase learns adjacent tokens
+PASS: Undo restores joined letters
+PASS: Undo rolls back phrase learning
+PASS: Mode cycle accepts tap
+PASS: Spacing fixture transcribes joined letters: Helloworld
+PASS: Choose suggestion hello world
+PASS: Missing-space phrase inserts in full
+PASS: Chosen phrase learns adjacent tokens
+PASS: Undo restores joined letters
+PASS: Undo rolls back phrase learning
+PASS: Learned word pair contributes a next-word suggestion
+PASS: Choose suggestion qzxlinekey
+PASS: Choosing a next word learns the preceding context, not the inserted word itself
+PASS: Suggestion supports long press
+PASS: Material forget dialog opens from IME window
+PASS: Forget preference persists
+PASS: Forget removes learned frequency and context
+PASS: Forgotten next-word suggestion disappears
+PASS: Manual teaching restores forgotten word
+PASS: Manual restoration clears forgotten preference
+PASS: Manual teaching restores one-letter words too
+PASS: Mode cycle accepts tap
+PASS: Choose suggestion hello
+PASS: Learning disabled prevents token and pair collection
+PASS: Password input never learns tokens or context
+PASS: Erase clears all adaptation data
+PASS: adaptation checks completed
+

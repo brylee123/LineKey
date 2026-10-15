@@ -16,13 +16,21 @@ import java.util.PriorityQueue;
 public final class Decoder {
   public record Candidate(String word, double cost, double score) {}
 
-  private record Word(String text, int frequency, double logFrequency, double compactPrior) {
+  private record Word(
+      String text, String letters, int frequency, double logFrequency, double compactPrior) {
     Word(String text, int frequency) {
+      this(text, WordSpelling.matchingLetters(text), frequency);
+    }
+
+    Word(String text, String letters, int frequency) {
       this(
           text,
+          letters,
           frequency,
           Math.log(frequency),
-          .16 * Math.log(frequency) + commonWordBonus(frequency));
+          .16 * Math.log(frequency)
+              + commonWordBonus(frequency)
+              - (text.equals(letters) ? 0 : .15));
     }
   }
 
@@ -66,21 +74,8 @@ public final class Decoder {
             + " learn settings language data privacy local word words coffee cat dog quick brown"
             + " fox jumps over lazy sentence letter letters words punctuation stop start build"
             + " project code free beautiful cool awesome nice better best";
-    try (var input = Decoder.class.getResourceAsStream("/english-frequency.txt")) {
-      if (input != null) {
-        var reader =
-            new java.io.BufferedReader(
-                new java.io.InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8));
-        for (String line; (line = reader.readLine()) != null; ) {
-          int separator = line.lastIndexOf(' ');
-          String word = line.substring(0, separator);
-          int frequency = Integer.parseInt(line.substring(separator + 1));
-          vocabulary.put(word, new Word(word, frequency));
-        }
-      }
-    } catch (java.io.IOException e) {
-      throw new IllegalStateException("Cannot load vocabulary", e);
-    }
+    loadWords(vocabulary, "/english-frequency.txt");
+    loadWords(vocabulary, "/english-punctuated.txt");
     int weight = 300;
     for (String s : seed.split(" "))
       vocabulary.putIfAbsent(
@@ -88,11 +83,33 @@ public final class Decoder {
 
     List<List<Word>> lengths = new ArrayList<>();
     for (int length = 0; length <= 32; length++) lengths.add(new ArrayList<>());
-    for (Word word : vocabulary.values()) lengths.get(word.text().length()).add(word);
+    for (Word word : vocabulary.values()) lengths.get(word.letters().length()).add(word);
     for (int length = 0; length < lengths.size(); length++)
       lengths.set(length, Collections.unmodifiableList(lengths.get(length)));
     return new Vocabulary(
         Collections.unmodifiableMap(vocabulary), Collections.unmodifiableList(lengths));
+  }
+
+  private static void loadWords(Map<String, Word> vocabulary, String resource) {
+    boolean plainLetters = resource.equals("/english-frequency.txt");
+    try (var input = Decoder.class.getResourceAsStream(resource)) {
+      if (input == null) throw new IllegalStateException("Missing vocabulary: " + resource);
+      var reader =
+          new java.io.BufferedReader(
+              new java.io.InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8));
+      for (String line; (line = reader.readLine()) != null; ) {
+        if (line.isBlank() || line.startsWith("#")) continue;
+        int separator = line.lastIndexOf(' ');
+        String word = line.substring(0, separator);
+        if (!plainLetters) word = WordSpelling.canonical(word);
+        int frequency = Integer.parseInt(line.substring(separator + 1));
+        if ((!plainLetters && !WordSpelling.valid(word)) || frequency < 1)
+          throw new IllegalStateException("Invalid vocabulary spelling: " + word);
+        vocabulary.put(word, new Word(word, frequency));
+      }
+    } catch (java.io.IOException e) {
+      throw new IllegalStateException("Cannot load vocabulary", e);
+    }
   }
 
   public int seedSize() {
@@ -100,7 +117,8 @@ public final class Decoder {
   }
 
   public void addWord(String word, int count) {
-    if (!word.matches("[a-zA-Z]{1,32}")) return;
+    if (!WordSpelling.valid(word)) return;
+    if (VocabularyHolder.DATA.words().containsKey(WordSpelling.canonical(word))) return;
     if (!personalized) {
       vocabulary = new LinkedHashMap<>(vocabulary);
       List<List<Word>> mutable = new ArrayList<>();
@@ -108,10 +126,10 @@ public final class Decoder {
       byLength = mutable;
       personalized = true;
     }
-    String lower = word.toLowerCase(Locale.ROOT);
-    Word learned = new Word(lower, 100000 + Math.min(1000, Math.max(0, count)) * 10000);
+    String lower = WordSpelling.canonical(word);
+    Word learned = new Word(lower, 500 + Math.min(1000, Math.max(0, count)) * 10);
     Word previous = vocabulary.put(lower, learned);
-    List<Word> length = byLength.get(lower.length());
+    List<Word> length = byLength.get(learned.letters().length());
     if (previous != null) length.remove(previous);
     length.add(learned);
   }
@@ -120,18 +138,76 @@ public final class Decoder {
     return predict(taps, layout, 1);
   }
 
+  private record Split(String text, int count, double likelihood, double prior) {}
+
+  /**
+   * Exact-letter missing-space suggestions, bounded to 32 letters and five words. Kept separate
+   * from touch decoding: never silently invent boundaries in an existing word.
+   */
+  public List<Candidate> missingSpaces(String raw, String previous, boolean compact) {
+    String text = raw.toLowerCase(Locale.ROOT);
+    if (text.length() < 4
+        || text.length() > 32
+        || !text.matches("[a-z]+")
+        || vocabulary.containsKey(text) && vocabulary.get(text).frequency() >= 2000)
+      return List.of();
+    List<List<Split>> paths = new ArrayList<>();
+    for (int i = 0; i <= text.length(); i++) paths.add(new ArrayList<>());
+    paths.get(0).add(new Split("", 0, 0, 0));
+    LanguageModel model = LanguageModel.get();
+    for (int end = 1; end <= text.length(); end++) {
+      List<Split> found = paths.get(end);
+      for (int start = 0; start < end; start++) {
+        Word word = vocabulary.get(text.substring(start, end));
+        if (word == null
+            || word.frequency() < 500
+            || word.letters().length() == 2 && word.frequency() < 2000
+            || word.letters().length() == 1 && !word.text().equals("a") && !word.text().equals("i"))
+          continue;
+        for (Split prefix : paths.get(start)) {
+          if (prefix.count() >= 5) continue;
+          String context =
+              prefix.count() == 0
+                  ? previous
+                  : prefix.text().substring(prefix.text().lastIndexOf(' ') + 1);
+          found.add(
+              new Split(
+                  prefix.text().isEmpty() ? word.text() : prefix.text() + " " + word.text(),
+                  prefix.count() + 1,
+                  prefix.likelihood()
+                      + word.logFrequency()
+                      - 18
+                      + .2 * model.score(context, word.text()),
+                  prefix.prior() + (compact ? word.compactPrior() : .12 * word.logFrequency())));
+        }
+      }
+      found.sort(
+          Comparator.comparingDouble(Split::likelihood).reversed().thenComparing(Split::text));
+      if (found.size() > 8) found.subList(8, found.size()).clear();
+    }
+    List<Candidate> result = new ArrayList<>();
+    for (Split split : paths.get(text.length()))
+      if (split.count() > 1)
+        result.add(
+            new Candidate(
+                split.text(),
+                .5 * (split.count() - 1),
+                split.prior() / split.count() - .7 - .35 * (split.count() - 2)));
+    return result;
+  }
+
   /** Same vocabulary, three independently implemented ranking approaches for benchmarking. */
   public List<Candidate> predict(List<Double> taps, LetterLayout layout, int algorithm) {
     if (taps.isEmpty()) return java.util.Collections.emptyList();
     List<Candidate> list = new ArrayList<>();
     for (var e : vocabulary.entrySet()) {
-      if (Math.abs(e.getKey().length() - taps.size()) > 2) continue;
+      if (Math.abs(e.getValue().letters().length() - taps.size()) > 2) continue;
       double cost =
           algorithm == 0
-              ? editDistance(literal(taps, layout), e.getKey()) * 3
+              ? editDistance(literal(taps, layout), e.getValue().letters()) * 3
               : algorithm == 1
-                  ? spatialCost(taps, e.getKey(), layout)
-                  : robustCost(taps, e.getKey(), layout);
+                  ? spatialCost(taps, e.getValue().letters(), layout)
+                  : robustCost(taps, e.getValue().letters(), layout);
       if (cost / Math.max(1, taps.size()) <= 1.5)
         list.add(
             new Candidate(
@@ -209,7 +285,7 @@ public final class Decoder {
       double prior = -2.4 * difference + word.compactPrior();
       double budget = Math.min(qualityLimit, prior - result.cutoff());
       if (difference * 2.7 > budget + 1e-9) continue;
-      double cost = forgivingCost(losses, word.text(), work, budget);
+      double cost = forgivingCost(losses, word.letters(), work, budget);
       if (cost <= qualityLimit && cost <= budget + 1e-9)
         result.add(word.text(), cost, -cost + prior);
     }
@@ -252,26 +328,28 @@ public final class Decoder {
 
   public List<Candidate> full(String raw) {
     if (raw.isEmpty()) return List.of();
-    String lower = raw.toLowerCase(Locale.ROOT);
+    if (!WordSpelling.valid(raw)) return List.of();
+    String spelling = WordSpelling.canonical(raw);
+    String lower = WordSpelling.letters(spelling);
+    boolean explicitPunctuation = !spelling.equals(lower);
     int maximum = lower.length() < 4 ? 0 : lower.length() < 7 ? 1 : 2;
-    if (maximum == 0) {
-      Word exact = vocabulary.get(lower);
-      return exact == null
-          ? List.of()
-          : List.of(new Candidate(lower, 0, .12 * exact.logFrequency()));
-    }
     Shortlist result = new Shortlist(32);
     int[][] work = new int[2][33];
     for (int length = Math.max(1, lower.length() - maximum);
         length <= Math.min(32, lower.length() + maximum);
         length++) {
       for (Word word : byLength.get(length)) {
-        int cost = boundedEditDistance(lower, word.text(), maximum, work);
+        // Explicit punctuation remains meaningful; omission matching is for letters-only input.
+        if (explicitPunctuation && !word.text().equals(spelling)) continue;
+        int cost = boundedEditDistance(lower, word.letters(), maximum, work);
         if (cost <= maximum)
           result.add(
               word.text(),
               cost,
-              -cost * 4 - Math.abs(lower.length() - length) * 2 + .12 * word.logFrequency());
+              -cost * 4
+                  - Math.abs(lower.length() - length) * 2
+                  + .12 * word.logFrequency()
+                  - (word.text().equals(spelling) ? 0 : .15));
       }
     }
     return result.sorted();

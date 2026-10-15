@@ -87,12 +87,20 @@ public final class LanguageModel {
 
   public List<Decoder.Candidate> rescore(List<Decoder.Candidate> candidates, String previous) {
     List<Decoder.Candidate> result = new ArrayList<>();
-    for (var candidate : candidates)
+    for (var candidate : candidates) {
+      double contextScore = 0;
+      String context = previous;
+      String[] tokens = candidate.word().split(" ");
+      for (String token : tokens) {
+        contextScore += score(context, token);
+        context = token;
+      }
       result.add(
           new Decoder.Candidate(
               candidate.word(),
               candidate.cost(),
-              candidate.score() + .35 * score(previous, candidate.word())));
+              candidate.score() + .35 * contextScore / tokens.length));
+    }
     result.sort(
         Comparator.comparingDouble(Decoder.Candidate::score)
             .reversed()

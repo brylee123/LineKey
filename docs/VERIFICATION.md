@@ -1,3 +1,25 @@
+# LineKey 0.7.6 verification
+
+783 core assertions passed, including missing-space segmentation/protected words, learned context reranking, personal next-word coverage outside the fixed model, phrase tokenization, explicit forgetting/restoration, persistence validation, and bounded/saturating counts. Prior sloppy-input, punctuation, and recorrection checks remain included. Android build and lint passed: 0 errors, 14 warnings. See build-validation-076.txt and lint-validation-076.txt.
+
+Complete API 37 x86_64 native smoke runs passed at 360dp (261 assertions) and 240dp (261 assertions). See emulator-076-standard.txt and emulator-076-narrow.txt. New native checks cover Mini/full phrase insertion and immediate undo with learning rollback; token/pair persistence; next-word choices learning the actual preceding word; Material long-press forgetting; removal of related pairs and predictions; manual restoration; learning disabled; password exclusion; and complete learning erasure. The ordinary hellp -> hello Space regression is retained: explicit phrase candidates must not enter single-word automatic-correction confidence checks. Original gestures, layouts, accents, emoji, tools, themes, literal/private fields and recorrection tests also ran.
+
+Missing-space repair is an explicit suggestion for otherwise correctly transcribed joined letters; joint typo-plus-space decoding remains open. Adaptation remains a bounded optional word/bigram model, not a neural language model or a measured guarantee of conversational accuracy. Keyboard geometry and bundled base word/model data are unchanged. No physical-device, battery, or general real-user accuracy evaluation is claimed. See PERSONALIZATION.md for controls, storage bounds and behavior.
+
+# LineKey 0.7.5 verification
+
+740 core assertions passed, covering original candidate restoration, UTF-16 ranges, prefix/suffix edits, repeated identical words and ambiguous deletions, punctuation, backward whole-word selections, changing replacement lengths, bounded retention, extraction windows and session clearing. The original decoder/contraction regressions remain included. Android lint reported 0 errors and 14 warnings; the final test-build log is android-test-build-075.txt and lint output is lint-validation-075.txt.
+
+The focused native test passes the exact sequence sztech → eaten → later typing → tap eaten → watch. It checks Mini/full modes, correction undo, repeated/longer/shorter replacements, edits before/inside words, duplicate positions, private fields, untracked spelling correction and automatic Space correction. Full API 37 x86_64 emulator regression runs passed at 360dp and 240dp; logs are emulator-075-standard.txt and emulator-075-narrow.txt. The focused log is recorrection-focused-075.txt.
+
+No new physical-device, all-editor, layout-audit, or general prediction-accuracy certification is claimed. Editors must support public text extraction and selection/commit APIs. Original alternatives are session-only and limited to the latest 64 recorded words; older/untracked words receive ordinary spelling matches. Word data, model, matching weights and keyboard geometry are unchanged from 0.7.4. See RECORRECTION.md for behavior and limits. Historical verification below describes earlier builds.
+
+# LineKey 0.7.4 verification
+
+The unchanged 170,000-entry base plus 332 punctuated spellings are bundled. 704 core assertions passed, including reachability of all 332 letters-only forms; representative compact cases cover four layouts at 180/360dp, Unicode punctuation normalization, literal ambiguity, and isolation/update of personal spellings. Native API 37 x86_64 emulator smoke runs passed at 360dp and 240dp. These exercise six punctuated spellings in both Mini and full mode, real candidate insertion, correction undo and whole-word deletion, plus the previous gesture, privacy, theme, emoji, floating and cursor checks. Logs: emulator-074-standard.txt and emulator-074-narrow.txt. Build and lint results: build-validation-074.txt and lint-validation-074.txt (0 errors, 14 warnings).
+
+No physical-device run or new general noisy-typing accuracy benchmark was performed. The 0.7.3 accuracy and search-equivalence measurements below are historical, not a certification of this expanded spelling inventory. Lookup remains synchronous. Dictionary startup and lookup diagnostics are in the emulator logs and dictionary-latency-074.txt; no device speed guarantee is made. See PUNCTUATED_WORDS.md for coverage, source weights and ambiguity limits.
+
 # LineKey 0.7.3 verification
 
 The bundled frequency asset contains exactly 170,000 entries. 192 core assertions passed; Android lint: 0 errors, 14 warnings. Both API 37 emulator widths (360dp and 240dp) passed 131 smoke assertions, including visible install recommendations for insgzoo/inxtzoo and the earlier ankrj/quick case. Logs: emulator-073-standard.txt and emulator-073-narrow.txt.

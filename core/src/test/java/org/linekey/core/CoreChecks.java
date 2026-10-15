@@ -16,9 +16,11 @@ public final class CoreChecks {
   }
 
   public static void main(String[] args) {
+    assertions += RecorrectionChecks.run();
+    assertions += AdaptationChecks.run();
     Decoder decoder = new Decoder();
     check(
-        decoder.seedSize() >= 170000 && decoder.seedSize() < 170050,
+        decoder.seedSize() >= 170000 && decoder.seedSize() < 171000,
         "Expanded 170k vocabulary is bundled");
     check(
         decoder.full("install").get(0).word().equals("install"),
@@ -43,6 +45,92 @@ public final class CoreChecks {
     check(
         decoder.forgiving(List.of(.5), regressionLayout, 240, 0).isEmpty(),
         "Empty candidate limit is safe");
+    for (String spelling :
+        List.of(
+            "don't",
+            "can't",
+            "i'm",
+            "we're",
+            "we'll",
+            "it's",
+            "well-known",
+            "mother-in-law",
+            "state-of-the-art",
+            "rock'n'roll",
+            "o'clock",
+            "children's",
+            "u.s.a.",
+            "r&d",
+            "and/or",
+            "c++")) {
+      String letters = WordSpelling.letters(spelling);
+      check(
+          decoder.full(letters).stream().anyMatch(c -> c.word().equals(spelling)),
+          "Full letters-only spelling offers " + spelling);
+      check(
+          decoder.full(spelling).get(0).word().equals(spelling),
+          "Explicit spelling stays exact: " + spelling);
+      for (int index = 0; index < 4; index++) {
+        LetterLayout formLayout = new LetterLayout(index);
+        List<Double> formTaps = new ArrayList<>();
+        for (char c : letters.toCharArray()) formTaps.add(formLayout.center(c));
+        for (int width : new int[] {180, 360})
+          check(
+              decoder.forgiving(formTaps, formLayout, width, 32).stream()
+                  .anyMatch(c -> c.word().equals(spelling)),
+              "Compact omitted punctuation offers "
+                  + spelling
+                  + " layout "
+                  + index
+                  + " width "
+                  + width);
+      }
+    }
+    for (String ambiguous : List.of("well", "ill", "were", "its", "shell", "hell", "cant"))
+      check(
+          decoder.full(ambiguous).get(0).word().equals(ambiguous),
+          "Exact unpunctuated word stays preferred: " + ambiguous);
+    check(decoder.full("DON’T").get(0).word().equals("don't"), "Curly apostrophe normalizes");
+    check(
+        decoder.full("well‑known").get(0).word().equals("well-known"),
+        "Nonbreaking hyphen normalizes");
+    for (String invalid : List.of("hello world", "a@@b", "a1b", "-word", "word-", "a..b"))
+      check(
+          !WordSpelling.valid(invalid) && decoder.full(invalid).isEmpty(),
+          "Invalid spelling rejected safely: " + invalid);
+    personal.addWord("qzx'line-key", 3);
+    check(
+        personal.full("qzxlinekey").stream().anyMatch(c -> c.word().equals("qzx'line-key")),
+        "Personal punctuated word participates");
+    personal.addWord("qzx'line-key", 4);
+    check(
+        personal.full("qzxlinekey").stream().filter(c -> c.word().equals("qzx'line-key")).count()
+            == 1,
+        "Personal frequency update does not duplicate punctuation alias");
+    check(new Decoder().full("qzxlinekey").isEmpty(), "Personal punctuation stays private");
+    List<Double> noisyContraction = new ArrayList<>();
+    for (char c : "dont".toCharArray()) noisyContraction.add(regressionLayout.center(c) + .005);
+    check(
+        decoder.forgiving(noisyContraction, regressionLayout, 240, 32).stream()
+            .anyMatch(c -> c.word().equals("don't")),
+        "Noisy taps also restore punctuation");
+    try (var input = CoreChecks.class.getResourceAsStream("/english-punctuated.txt")) {
+      var reader =
+          new java.io.BufferedReader(
+              new java.io.InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8));
+      int count = 0;
+      for (String line; (line = reader.readLine()) != null; ) {
+        String spelling = line.substring(0, line.lastIndexOf(' '));
+        check(
+            decoder.full(WordSpelling.letters(spelling)).stream()
+                .anyMatch(c -> c.word().equals(spelling)),
+            "Bundled spelling is reachable without punctuation: " + spelling);
+        count++;
+      }
+      check(count == 332, "Supplemental spelling inventory coverage");
+    } catch (java.io.IOException error) {
+      throw new AssertionError(error);
+    }
     LanguageModel model = LanguageModel.get();
     check(model.pairCount() > 50000, "Corpus-trained context coverage");
     check(model.next("according", 3).get(0).word().equals("to"), "Natural next-word context");

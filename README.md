@@ -1,6 +1,6 @@
 # LineKey
 
-An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7.3 prototype.
+An independent, open-source Android keyboard inspired by compact, approximate-touch typing. Working name: **LineKey**. This is a runnable 0.7.6 prototype.
 
 ## Open in Android Studio
 
@@ -24,7 +24,7 @@ On macOS/Linux: `sh gradlew :core:verifyCore :app:assembleDebug :app:lintDebug`.
 - Tap the layout button to cycle **Mini → ABC → 123 → #+= → Mini**. Its label shows the next layout. Hold it for tools and settings. Full layouts have one body Delete key and no Compact/Delete shortcuts in the suggestion header. Emoji search has its own body Delete and an ABC return through the layout button.
 - Compact mode uses three rows; no idle branding label. Bottom padding includes IME caption/navigation/gesture insets and a minimum 48dp system-control gutter in every mode.
 - Light / Dark / System themes, Google Sans typography, rounded expanded keys, left/right handed placement, adjustable heights, swipe threshold, hold delay, system haptics and sound.
-- Optional local learning (off by default), manual word teaching, and personal-dictionary erasure. Password / visible-password / web-password / numeric-password fields suppress suggestions and learning. URL/email fields use literal typing; `IME_FLAG_NO_PERSONALIZED_LEARNING` suppresses learning.
+- Optional local word/pair learning (off by default), manual teaching, individual word forgetting, and complete learning erasure. Password / visible-password / web-password / numeric-password fields suppress suggestions and learning. URL/email fields use literal typing; `IME_FLAG_NO_PERSONALIZED_LEARNING` suppresses learning.
 - No network, microphone, contacts or storage permissions; no app networking, analytics or Android backup. AndroidX adds a signature-only permission for protecting internal receivers. Voice delegates to an installed speech provider, requests offline recognition, and presents a draft for explicit insertion; the provider controls microphone and network behavior.
 
 - Offline next-word suggestions and contextual reranking; see [model data, held-out accuracy, and limits](docs/LANGUAGE_MODEL.md).
@@ -105,3 +105,17 @@ Left-to-right compact swipes confirm the current word and add a space. Right-to-
 ## 0.7.3 vocabulary expansion
 
 The bundled English frequency list now contains 170,000 entries, including install/installs/installing. The spatial decoder uses length indexing, shared immutable vocabulary, cached letter losses and bounded candidate selection; full-key search uses a bounded edit-distance band. A saturating common-word prior keeps frequent everyday words ahead of low-frequency corpus names without removing those entries. Preparation is reproducible from a pinned, hash-verified upstream file. See [dictionary coverage and measurements](docs/DICTIONARY_073.md).
+
+### 0.7.4 punctuation-free spelling
+
+Type letters only to find contractions, hyphenated words, possessives and selected joined abbreviations: `dont` → `don't`, `wellknown` → `well-known`, `rocknroll` → `rock'n'roll`, `usa` → `u.s.a.`, `rd` → `r&d`, `andor` → `and/or`. Both Mini and full alphabet mode use these spellings. Literal input remains the first selectable suggestion, and ambiguous words such as `well` / `we'll` remain separate candidates. Select a spelling to insert its punctuation; ordinary confidence-gated correction still applies on Space.
+
+The original 170,000-entry frequency resource remains intact, with 332 additional conventional spellings in a separately generated resource. Optional personal learning accepts supported punctuated spellings. See [punctuated spelling design and limits](docs/PUNCTUATED_WORDS.md).
+
+### 0.7.5 revisit a word
+
+Tap inside a committed word, or select the whole word, to restore its original spelling alternatives. Choosing another suggestion replaces only that word and preserves its spacing and surrounding text. Up to 64 words retain their original alternatives in memory for the current field session; private/literal fields are excluded. Text without saved evidence receives ordinary spelling matches. See [recorrection behavior and limits](docs/RECORRECTION.md).
+
+## Personal predictions and missing spaces (0.7.6)
+
+Joined input such as `helloworld` can suggest `hello world`. Optional local learning now adapts to word choices and adjacent words. Long-press a word suggestion to forget it, including its learned context. See [behavior, privacy, and limits](docs/PERSONALIZATION.md).

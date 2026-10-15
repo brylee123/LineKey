@@ -1,0 +1,115 @@
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\IconButton.java:20: Warning: Use AppCompatResources.getDrawable() [UseCompatLoadingForDrawables from androidx.appcompat]
+        getContext().getDrawable(capsLock ? R.drawable.ic_control_shift_caps : resource).mutate();
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseCompatLoadingForDrawables":
+   Use Compat loading of drawables
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.appcompat
+   Feedback: https://issuetracker.google.com/issues/new?component=460343
+
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\res\drawable\ic_control_backspace.xml:9: Warning: Very long vector path (936 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector. [VectorPath]
+      android:pathData="M360,760Q340,760 322.5,751Q305,742 294,726L153,526Q138,505 138,480Q138,455 153,434L294,234Q305,218 322.5,209Q340,200 360,200L760,200Q793,200 816.5,223.5Q840,247 840,280L840,680Q840,713 816.5,736.5Q793,760 760,760L360,760ZM760,680Q760,680 760,680Q760,680 760,680L760,480L760,280Q760,280 760,280Q760,280 760,280L760,280Q760,280 760,280Q760,280 760,280L760,680Q760,680 760,680Q760,680 760,680L760,680ZM360,680L760,680Q760,680 760,680Q760,680 760,680L760,280Q760,280 760,280Q760,280 760,280L360,280Q360,280 360,280Q360,280 360,280L218,480Q218,480 218,480Q218,480 218,480L360,680Q360,680 360,680Q360,680 360,680ZM560,536L636,612Q647,623 664,623Q681,623 692,612Q703,601 703,584Q703,567 692,556L616,480L692,404Q703,393 703,376Q703,359 692,348Q681,337 664,337Q647,337 636,348L560,424L484,348Q473,337 456,337Q439,337 428,348Q417,359 417,376Q417,393 428,404L504,480L428,556Q417,567 417,584Q417,601 428,612Q439,623 456,623Q473,623 484,612L560,536Z"/>
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\res\drawable\ic_control_sentiment_satisfied.xml:8: Warning: Very long vector path (1140 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector. [VectorPath]
+      android:pathData="M480,700Q533,700 580.5,677Q628,654 657,610Q668,593 660,576.5Q652,560 634,560Q626,560 619.5,563.5Q613,567 609,574Q586,605 552,622.5Q518,640 480,640Q442,640 408,622.5Q374,605 351,574Q346,567 339.5,563.5Q333,560 325,560Q307,560 299,576Q291,592 302,608Q331,653 378.5,676.5Q426,700 480,700ZM620,440Q645,440 662.5,422.5Q680,405 680,380Q680,355 662.5,337.5Q645,320 620,320Q595,320 577.5,337.5Q560,355 560,380Q560,405 577.5,422.5Q595,440 620,440ZM340,440Q365,440 382.5,422.5Q400,405 400,380Q400,355 382.5,337.5Q365,320 340,320Q315,320 297.5,337.5Q280,355 280,380Q280,405 297.5,422.5Q315,440 340,440ZM480,880Q397,880 324,848.5Q251,817 197,763Q143,709 111.5,636Q80,563 80,480Q80,397 111.5,324Q143,251 197,197Q251,143 324,111.5Q397,80 480,80Q563,80 636,111.5Q709,143 763,197Q817,251 848.5,324Q880,397 880,480Q880,563 848.5,636Q817,709 763,763Q709,817 636,848.5Q563,880 480,880ZM480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480Q480,480 480,480ZM480,800Q614,800 707,707Q800,614 800,480Q800,346 707,253Q614,160 480,160Q346,160 253,253Q160,346 160,480Q160,614 253,707Q346,800 480,800Z"/>
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "VectorPath":
+   Using long vector paths is bad for performance. There are several ways to
+   make the pathData shorter:
+   * Using less precision
+   * Removing some minor details
+   * Using the Android Studio vector conversion tool
+   * Rasterizing the image (converting to PNG)
+
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\CompactStrip.java:15: Warning: Custom view CompactStrip is missing constructor used by tools: (Context) or (Context,AttributeSet) or (Context,AttributeSet,int) [ViewConstructor]
+final class CompactStrip extends View {
+            ~~~~~~~~~~~~
+
+   Explanation for issues of type "ViewConstructor":
+   Some layout tools (such as the Android layout editor) need to find a
+   constructor with one of the following signatures:
+   * View(Context context)
+   * View(Context context, AttributeSet attrs)
+   * View(Context context, AttributeSet attrs, int defStyle)
+
+   If your custom view needs to perform initialization which does not apply
+   when used in a layout editor, you can surround the given code with a check
+   to see if View#isInEditMode() is false, since that method will return false
+   at runtime but true within a user interface editor.
+
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:907: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+    drag.setOnTouchListener(
+    ^
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:908: Warning: onTouch lambda should call View#performClick when a click is detected [ClickableViewAccessibility]
+        (view, event) -> {
+        ^
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1264: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+    key.setOnTouchListener(
+    ^
+
+   Explanation for issues of type "ClickableViewAccessibility":
+   If a View that overrides onTouchEvent or uses an OnTouchListener does not
+   also implement performClick and call it when clicks are detected, the View
+   may not handle accessibility actions properly. Logic handling the click
+   actions should ideally be placed in View#performClick as some accessibility
+   services invoke performClick when a click action should occur.
+
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:1681: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+      empty.setText("No matches. Try a name such as heart, coffee, or smile.");
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\MainActivity.java:162: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            count.setText(words.size() + " personal words · limit 500");
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\MainActivity.java:162: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            count.setText(words.size() + " personal words · limit 500");
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\MainActivity.java:179: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                      count.setText("0 personal words · limit 500");
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\MainActivity.java:363: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+          caption.setText(label + ": " + (int) value);
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\AccentPopup.java:86: Warning: Use "Gravity.START" instead of "Gravity.LEFT" to ensure correct behavior in right-to-left locales [RtlHardcoded]
+        anchor, Gravity.TOP | Gravity.LEFT, x - windowOrigin[0], y - windowOrigin[1]);
+                                      ~~~~
+C:\Users\bryle\Documents\Codex\2026-10-14\her\outputs\LineKey\app\src\main\java\org\linekey\keyboard\LineKeyIme.java:324: Warning: Use "Gravity.START" instead of "Gravity.LEFT" to ensure correct behavior in right-to-left locales [RtlHardcoded]
+      box.gravity = Gravity.BOTTOM | Gravity.LEFT;
+                                             ~~~~
+
+   Explanation for issues of type "RtlHardcoded":
+   Using Gravity#LEFT and Gravity#RIGHT can lead to problems when a layout is
+   rendered in locales where text flows from right to left. Use Gravity#START
+   and Gravity#END instead. Similarly, in XML gravity and layout_gravity
+   attributes, use start rather than left.
+
+   For XML attributes such as paddingLeft and layout_marginLeft, use
+   paddingStart and layout_marginStart. NOTE: If your minSdkVersion is less
+   than 17, you should add both the older left/right attributes as well as the
+   new start/end attributes. On older platforms, where RTL is not supported
+   and the start/end attributes are unknown and therefore ignored, you need
+   the older left/right attributes. There is a separate lint check which
+   catches that type of error.
+
+   (Note: For Gravity#LEFT and Gravity#START, you can use these constants even
+   when targeting older platforms, because the start bitmask is a superset of
+   the left bitmask. Therefore, you can use gravity="start" rather than
+   gravity="left|start".)
+
+0 errors, 14 warnings

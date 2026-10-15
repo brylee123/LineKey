@@ -20,6 +20,7 @@ def main():
     data = args.input.read_bytes() if args.input else urllib.request.urlopen(SOURCE, timeout=60).read()
     if hashlib.sha256(data).hexdigest() != SHA256:
         raise SystemExit("Source SHA-256 mismatch")
+    source_counts = dict(line.rsplit(" ", 1) for line in data.decode("utf-8").splitlines())
     words = {}
     for line in data.decode("utf-8").splitlines():
         word, frequency = line.rsplit(" ", 1)
@@ -31,6 +32,25 @@ def main():
         raise SystemExit("Unexpected vocabulary coverage")
     target = Path(__file__).resolve().parents[1] / "core/src/main/resources/english-frequency.txt"
     target.write_bytes("".join(f"{word} {frequency}\n" for word, frequency in words.items()).encode("ascii"))
+    # Source splits apostrophes into separate tokens. Restore independently listed
+    # spellings, not arbitrary punctuation at every possible character boundary.
+    spellings = Path(__file__).with_name("punctuated-spellings.txt")
+    punctuated = {}
+    for line in spellings.read_text(encoding="utf-8").splitlines():
+        if line.startswith("#"):
+            continue
+        for spelling in line.lower().split():
+            letters = re.sub(r"['.&/+#-]", "", spelling)
+            if (not re.fullmatch(r"[a-z]{1,32}", letters)
+                    or not re.fullmatch(r"[a-z]+(?:(?:['.&/-]|'-)[a-z]+)*(?:\.|\+\+|#)?", spelling)):
+                raise SystemExit(f"Invalid spelling {spelling}")
+            frequency = int(source_counts.get(spelling, 0))
+            if not frequency:
+                frequency = max(100, int(source_counts.get(letters, 0)))
+            punctuated[spelling] = frequency
+    additional = target.with_name("english-punctuated.txt")
+    additional.write_bytes("".join(f"{w} {f}\n" for w, f in sorted(punctuated.items())).encode("ascii"))
+    print(f"Wrote {len(punctuated)} additional spellings; SHA-256 {hashlib.sha256(additional.read_bytes()).hexdigest()}")
     print(f"Wrote {len(words):,} entries; minimum count {min(words.values())}; output SHA-256 {hashlib.sha256(target.read_bytes()).hexdigest()}")
 
 if __name__ == "__main__":
