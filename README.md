@@ -119,3 +119,7 @@ Tap inside a committed word, or select the whole word, to restore its original s
 ## Personal predictions and missing spaces (0.7.6)
 
 Joined input such as `helloworld` can suggest `hello world`. Optional local learning now adapts to word choices and adjacent words. Long-press a word suggestion to forget it, including its learned context. See [behavior, privacy, and limits](docs/PERSONALIZATION.md).
+
+## Code style
+
+Java uses 4-space indentation, same-line braces, explicit types/imports, and final bindings by default. Run `python tools/format_java.py --check` to check formatting and structural rules. See [CODE_STYLE.md](docs/CODE_STYLE.md) for tools, final-state exceptions, and examples.

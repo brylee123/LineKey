@@ -3,47 +3,58 @@
 
 package org.linekey.keyboard;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 
 final class Preferences {
-  final SharedPreferences store;
-  private final Context context;
+    final SharedPreferences store;
+    private final Context context;
 
-  Preferences(Context context) {
-    this.context = context;
-    store = context.getSharedPreferences("linekey_settings", Context.MODE_PRIVATE);
-    if (!store.contains("theme"))
-      store.edit().putInt("theme", store.contains("dark") ? bool("dark", true) ? 1 : 0 : 2).apply();
-  }
-
-  boolean isDark() {
-    int theme = number("theme", store.contains("dark") ? bool("dark", true) ? 1 : 0 : 2);
-    if (theme != 2) return theme == 1;
-    android.app.UiModeManager manager =
-        (android.app.UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
-    if (manager != null) {
-      if (manager.getNightMode() == android.app.UiModeManager.MODE_NIGHT_YES) return true;
-      if (manager.getNightMode() == android.app.UiModeManager.MODE_NIGHT_NO) return false;
+    Preferences(final Context context) {
+        this.context = context;
+        store = context.getSharedPreferences("linekey_settings", Context.MODE_PRIVATE);
+        if (!store.contains("theme")) {
+            store.edit()
+                    .putInt("theme", store.contains("dark") ? bool("dark", true) ? 1 : 0 : 2)
+                    .apply();
+        }
     }
-    return (android.content.res.Resources.getSystem().getConfiguration().uiMode
-            & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
-        == android.content.res.Configuration.UI_MODE_NIGHT_YES;
-  }
 
-  boolean bool(String key, boolean fallback) {
-    return store.getBoolean(key, fallback);
-  }
+    boolean isDark() {
+        final int theme = number("theme", store.contains("dark") ? bool("dark", true) ? 1 : 0 : 2);
+        if (theme != 2) {
+            return theme == 1;
+        }
+        final UiModeManager manager =
+                (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
+        if (manager != null) {
+            if (manager.getNightMode() == UiModeManager.MODE_NIGHT_YES) {
+                return true;
+            }
+            if (manager.getNightMode() == UiModeManager.MODE_NIGHT_NO) {
+                return false;
+            }
+        }
+        return (Resources.getSystem().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                == Configuration.UI_MODE_NIGHT_YES;
+    }
 
-  int number(String key, int fallback) {
-    return store.getInt(key, fallback);
-  }
+    boolean bool(final String key, final boolean fallback) {
+        return store.getBoolean(key, fallback);
+    }
 
-  void set(String key, boolean value) {
-    store.edit().putBoolean(key, value).apply();
-  }
+    int number(final String key, final int fallback) {
+        return store.getInt(key, fallback);
+    }
 
-  void set(String key, int value) {
-    store.edit().putInt(key, value).apply();
-  }
+    void set(final String key, final boolean value) {
+        store.edit().putBoolean(key, value).apply();
+    }
+
+    void set(final String key, final int value) {
+        store.edit().putInt(key, value).apply();
+    }
 }
